@@ -39,6 +39,7 @@ erDiagram
         DATE data
         BOOLEAN concluida
     }
+```
 ## Planejamento de sprints
 
 O desenvolvimento do **CanDo** será dividido em 8 sprints, com duração estimada de uma semana cada. O planejamento contempla as etapas de planejamento, prototipação, modelagem do banco de dados, desenvolvimento das funcionalidades, testes e finalização do aplicativo.
