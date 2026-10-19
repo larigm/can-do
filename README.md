@@ -77,7 +77,7 @@ O aplicativo utilizará um banco de dados local **SQLite** para armazenar as tar
 
 ```mermaid
 erDiagram
-    TAREFA ||--o { SUBTAREFA : possui
+    TAREFA ||--o{ SUBTAREFA : possui
     TAREFA {
         INTEGER id PK
         TEXT titulo
