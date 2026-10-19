@@ -71,13 +71,15 @@ Marcar tarefa ou subtarefas como concluídas
 Progresso atualizado
 ```
 
+
 ## Modelagem do banco de dados (SQLite)
 
-O aplicativo utilizará um banco de dados local **SQLite** para armazenar as tarefas e suas respectivas subtarefas.
+O aplicativo utilizará SQLite para armazenar as tarefas e suas subtarefas.
 
 ```mermaid
 erDiagram
-    TAREFA ||--o { SUBTAREFA : possui
+    TAREFA ||--o{ SUBTAREFA : possui
+
     TAREFA {
         INTEGER id PK
         TEXT titulo
@@ -88,6 +90,7 @@ erDiagram
         TEXT horario
         BOOLEAN concluida
     }
+
     SUBTAREFA {
         INTEGER id PK
         INTEGER tarefa_id FK
@@ -95,6 +98,9 @@ erDiagram
         BOOLEAN concluida
     }
 ```
+
+
+
 
 ## Atualizações desde o último checkpoint
 
