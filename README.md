@@ -8,17 +8,18 @@ A proposta do aplicativo é oferecer uma experiência simples e intuitiva para a
 
 ### Funcionalidades essenciais
 
+* [x] Criar tarefa
 * [x] Listar e visualizar tarefas
+* [ ] Editar tarefa
+* [x] Marcar tarefa como concluída
+* [ ] Excluir tarefa
+* [x] Definir categoria para a tarefa
+* [x] Definir prioridade da tarefa
+* [ ] Definir data e horário para a tarefa
+* [x] Criar subtarefas dentro de uma tarefa
+* [x] Marcar subtarefas como concluídas
 * [x] Visualizar o progresso diário
 * [x] Visualizar o progresso das subtarefas
-* [x] Marcar subtarefas como concluídas (interativo na interface)
-* [ ] Criar tarefa (persistência no banco de dados)
-* [ ] Editar tarefa (persistência no banco de dados)
-* [ ] Excluir tarefa (persistência no banco de dados)
-* [ ] Definir categoria para a tarefa
-* [ ] Definir prioridade da tarefa
-* [ ] Definir data e horário para a tarefa
-* [ ] Criar subtarefas dentro de uma tarefa
 
 ### Funcionalidades adicionais (trabalhos futuros)
 
@@ -37,10 +38,10 @@ Os protótipos do **CanDo** foram desenvolvidos no Figma, seguindo um Design Sys
 ### Principais telas
 
 * Splash Screen
-* Tela inicial / Hoje
-* Criar tarefa (Nova tarefa)
+* Tela inicial / Hoje (`app/index.tsx`)
+* Criar tarefa (`app/new-task.tsx`)
 * Editar tarefa
-* Detalhes da tarefa
+* Detalhes da tarefa (`app/task-details.tsx`)
 * Todas as tarefas
 * Progresso
 * Perfil / Configurações
@@ -51,21 +52,23 @@ Os protótipos do **CanDo** foram desenvolvidos no Figma, seguindo um Design Sys
 ```text
 Splash
    ↓
-Hoje (index)
+Hoje
    ↓
-Nova tarefa (new-task)
+Nova tarefa
    ↓
-Preencher tarefa e subtarefas
+Preencher tarefa
    ↓
 Adicionar tarefa
    ↓
 Tarefa aparece na lista
    ↓
-Detalhes da tarefa (task-details)
+Detalhes da tarefa
+   ↓
+Adicionar subtarefas (opcional)
    ↓
 Marcar tarefa ou subtarefas como concluídas
    ↓
-Progresso atualizado em tempo real
+Progresso atualizado
 ```
 
 ## Modelagem do banco de dados (SQLite)
@@ -74,7 +77,7 @@ O aplicativo utilizará um banco de dados local **SQLite** para armazenar as tar
 
 ```mermaid
 erDiagram
-    TAREFA ||--o{ SUBTAREFA : possui
+    TAREFA ||--o { SUBTAREFA : possui
     TAREFA {
         INTEGER id PK
         TEXT titulo
@@ -95,50 +98,33 @@ erDiagram
 
 ## Atualizações desde o último checkpoint
 
-Neste checkpoint, foi desenvolvida a base arquitetural e visual do **CanDo**, implementando a navegação com Expo Router, estilização alinhada ao protótipo do Figma, dados mockados e componentes reutilizáveis.
+Neste checkpoint, foi desenvolvida a base arquitetural e visual do CanDo, implementando a navegação com Expo Router, estilização alinhada ao protótipo do Figma, dados mockados e componentes reutilizáveis.
 
 ### Recursos aplicados dos módulos anteriores
 
-* **Expo Router (v58):** Configuração do roteamento baseado em arquivos (`app/`), pilha de navegação nativa (`Stack`) em `app/_layout.tsx` e navegação declarativa com o hook `useRouter` (`router.push` e `router.back`).
-* **Multiplataforma (Mobile e Web):** Suporte completo para emuladores, Expo Go (Android/iOS) e navegadores desktop utilizando `react-native-web`.
-* **TypeScript Estrito:** Toda a aplicação foi construída em TypeScript, com interfaces bem definidas para o modelo de dados de tarefas (`Task`, `Subtask`, `TaskCategory`, `TaskPriority`) e tipagem estrita de props em todos os componentes.
-* **Tipografia Customizada:** Integração da fonte **Inter** (`Inter_400Regular`, `Inter_500Medium`, `Inter_600SemiBold` e `Inter_700Bold`) via `@expo-google-fonts/inter` e `expo-font`, carregada de forma assíncrona no layout raiz com splash indicator.
-* **Biblioteca de Ícones Oficiais:** Utilização de `@expo/vector-icons` (`Ionicons`) para garantir consistência visual em botões de ação, menus, checkboxes e estados visuais.
-* **Design Tokens / Theme Centralizado:** Criação de `constants/theme.ts` atuando como Single Source of Truth para a paleta de cores (destaque azul `#5B6BFE`, fundos suaves `#EEF2FF`, tons de texto e bordas), espaçamentos e raios de borda.
-* **Camada de Mocking Desacoplada:** Criação de `mocks/types.ts` simulando dados reais com tarefas pendentes, tarefas concluídas e subtarefas estruturadas.
+* **Expo Router:** navegação entre telas via `Stack` e roteamento em `app/` com `useRouter`.
+* **TypeScript:** tipagem do modelo de dados (`Task`, `Subtask`) e das props dos componentes.   
+* **Google Fonts (Inter):** tipografia do Figma carregada com `@expo-google-fonts/inter`.
+* **Expo Vector Icons:** ícones de navegação, status e botões com `Ionicons`.
+* **Theme / Design Tokens:** centralização de cores e estilos em `constants/theme.ts`.
+* **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas no checkpoint.
 
-### Aplicação das Boas Práticas para Componentes Reutilizáveis
+### Boas práticas na criação de componentes
 
-Durante a construção dos componentes em `components/`, foram aplicados rigorosamente os conceitos apresentados na aula:
-
-1. **Princípio da Responsabilidade Única (Single Responsibility Principle - SRP):**
-   * Cada componente foi isolado para desempenhar exclusivamente uma única função na interface:
-     * `HeaderGreeting`: Responsável somente pela saudação personalizada, data formatada e gatilho de configurações.
-     * `WeekDaySelector`: Gerencia exclusivamente a renderização do seletor em pílula dos dias da semana e o feedback visual do dia ativo.
-     * `DailyProgressCard`: Calcula percentual e renderiza a barra de progresso visual de forma isolada.
-     * `EmptyState`: Exibe a ilustração de prancheta, texto motivacional e CTA de criação para dias sem tarefas.
-     * `TaskCard`: Exibe os dados de uma tarefa individual, badge de categoria, indicador de prioridade e checkbox.
-     * `FloatingActionButton`: Botão circular de adição flutuante posicionado de forma desacoplada com `zIndex`.
-     * `BottomTabBar`: Barra inferior padronizada com navegação contextual entre as seções do app.
-
-2. **Componentes Apresentacionais (Dumb Components) e Desacoplamento:**
-   * Os componentes não dependem de regras de negócio acopladas nem manipulam banco de dados diretamente. Eles recebem informações via props e emitem eventos por callbacks (`onToggleComplete`, `onPressDetails`, `onSelectDay`), garantindo que possam ser reutilizados em diferentes telas (como na futura tela "Todas as tarefas").
-
-3. **Props Tipadas com Interfaces TypeScript:**
-   * Todos os componentes possuem contratos explícitos de propriedades (ex: `TaskCardProps`, `WeekDaySelectorProps`, `HeaderGreetingProps`), prevenindo erros em tempo de compilação e oferecendo documentação viva no VS Code.
-
-4. **Separação de Preocupações e Arquitetura Limpa:**
-   * Separação clara de diretórios: rotas em `app/`, componentes visuais reutilizáveis em `components/`, regras de estilo globais em `constants/`, contratos de dados em `types/` e dados simulados em `mocks/`.
+* **Responsabilidade Única (SRP):** cada componente tem apenas uma função visual isolada (ex: `TaskCard` para tarefas, `DailyProgressCard` para o progresso, `EmptyState` para estado vazio).
+* **Componentes Apresentacionais (Dumb Components):** recebem dados e emitem ações via `props` (`onPress`, `onToggleComplete`), sem regra de negócio embutida.
+* **Props Tipadas com TypeScript:** uso de `interfaces` em cada componente garantindo consistência e prevenindo erros.
+* **Modularidade e Separação de Pastas:** divisão clara entre rotas (`app/`), componentes (`components/`), tipos (`types/`) e dados (`mocks/`).
 
 ## Planejamento de sprints
 
-O desenvolvimento do **CanDo** está organizado em sprints semanais, contemplando desde a concepção até a entrega final.
+O desenvolvimento do **CanDo** está planejado em 8 sprints:
 
 ### Sprint 1 — Planejamento e prototipação
 * [x] Definir as funcionalidades essenciais do aplicativo
 * [x] Definir o fluxo de navegação
 * [x] Criar as telas principais no Figma seguindo Design System
-* [x] Criar o protótipo interativo e componentes de interface
+* [x] Criar o protótipo interativo
 * [x] Revisar a experiência de navegação
 
 ### Sprint 2 — Estrutura inicial e roteamento (Checkpoint Atual)
@@ -147,68 +133,67 @@ O desenvolvimento do **CanDo** está organizado em sprints semanais, contempland
 * [x] Configurar o Expo Router com `app/_layout.tsx`
 * [x] Configurar tipografia Inter com `@expo-google-fonts/inter`
 * [x] Configurar Design Tokens centralizados em `constants/theme.ts`
-* [x] Estruturar pastas (`app/`, `components/`, `mocks/`, `types/`, `constants/`)
+* [x] Organizar a estrutura de pastas do projeto
 
 ### Sprint 3 — Composição de telas e componentes reutilizáveis (Checkpoint Atual)
-* [x] Desenvolver a tela inicial **Hoje** (`app/index.tsx`) idêntica ao Figma
-* [x] Implementar componentes reutilizáveis (`HeaderGreeting`, `WeekDaySelector`, `DailyProgressCard`, `EmptyState`, `TaskCard`, `FloatingActionButton`, `BottomTabBar`)
-* [x] Desenvolver a tela **Nova Tarefa** (`app/new-task.tsx`) com formulário, categorias, prioridades e subtarefas dinâmicas
-* [x] Desenvolver a tela **Detalhes da Tarefa** (`app/task-details.tsx`) com subtarefas interativas e botões de ação
-* [x] Popular telas com dados mockados (`mocks/types.ts`) e cálculo dinâmico de progresso
-* [x] Implementar navegação completa de ida e volta entre as 3 telas
+* [x] Desenvolver a tela inicial **Hoje** (`app/index.tsx`)
+* [x] Implementar componentes reutilizáveis na pasta `components/`
+* [x] Desenvolver a tela **Nova Tarefa** (`app/new-task.tsx`) com formulário e subtarefas
+* [x] Desenvolver a tela **Detalhes da Tarefa** (`app/task-details.tsx`) com subtarefas interativas
+* [x] Popular as 3 telas com dados mockados (`mocks/types.ts`)
+* [x] Implementar navegação funcional de ida e volta entre as 3 telas
 
 ### Sprint 4 — Modelagem e persistência com SQLite
-* [ ] Configurar biblioteca local do SQLite no Expo
-* [ ] Criar tabelas `TAREFA` e `SUBTAREFA` conforme modelagem ERD
-* [ ] Implementar operações de CRUD de tarefas (inserção, listagem, atualização e exclusão)
-* [ ] Implementar inserção e alternância de conclusão das subtarefas
-* [ ] Integrar operações do banco de dados às telas existentes
+* [ ] Configurar SQLite no Expo
+* [ ] Criar tabelas `TAREFA` e `SUBTAREFA`
+* [ ] Implementar operações de CRUD de tarefas (inserir, listar, editar e excluir)
+* [ ] Implementar persistência e alternância de conclusão das subtarefas
+* [ ] Conectar banco de dados às telas existentes
 
 ### Sprint 5 — Validações e gerenciamento de estado
-* [ ] Implementar validação de formulários na criação de tarefas
-* [ ] Integrar estado global ou context para sincronização entre telas
-* [ ] Implementar filtros de tarefas por categoria e status (concluídas/pendentes)
-* [ ] Implementar atualização reativa do progresso diário
+* [ ] Implementar validação dos campos na criação de tarefas
+* [ ] Implementar sincronização de estado entre telas
+* [ ] Implementar filtros de tarefas por categoria e status
+* [ ] Atualização reativa da barra de progresso diário
 
 ### Sprint 6 — Funcionalidades adicionais e refinamento
-* [ ] Desenvolver tela "Todas as tarefas" e tela "Progresso"
+* [ ] Desenvolver telas complementares (Todas as tarefas e Progresso)
 * [ ] Implementar filtros de busca por data
-* [ ] Implementar feedback visual (snackbars/toasts e animações suaves)
-* [ ] Testes de layout em diferentes tamanhos de tela (Android, iOS e Web)
+* [ ] Implementar feedback visual (mensagens e animações suaves)
+* [ ] Testes de responsividade em diferentes telas
 
 ### Sprint 7 — Testes e estabilização
-* [ ] Testar fluxo completo de criação, visualização e conclusão de tarefas e subtarefas
-* [ ] Testar persistência dos dados após fechar e reabrir o app
-* [ ] Correção de possíveis inconsistências de layout e bugs de navegação
-* [ ] Verificação com `expo-doctor` e `tsc --noEmit`
+* [ ] Testar fluxo completo de tarefas e subtarefas
+* [ ] Testar persistência dos dados ao reabrir o app
+* [ ] Correção de bugs de layout e navegação
+* [ ] Validação com `expo-doctor` e `npx tsc --noEmit`
 
 ### Sprint 8 — Finalização e entrega
-* [ ] Revisão geral do alinhamento com o protótipo do Figma
-* [ ] Atualização final do README e documentação
-* [ ] Gravação do vídeo final do projeto
-* [ ] Entrega da versão final do CanDo
+* [ ] Ajustes finais de interface conforme protótipo do Figma
+* [ ] Atualização final da documentação
+* [ ] Gravação do vídeo final de apresentação
+* [ ] Entrega da versão final do aplicativo
 
 ## Como executar o projeto
 
 ### Pré-requisitos
 * Node.js (v18 ou superior)
 * npm ou yarn
-* Aplicativo **Expo Go** instalado no celular (opcional para teste físico)
+* Expo Go no celular (opcional)
 
 ### Instalação e execução
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/larigm/can-do.git
 
-# 2. Acesse a pasta do projeto
+# 2. Acesse a pasta
 cd can-do
 
 # 3. Instale as dependências
 npm install
 
-# 4. Inicie o servidor Expo
+# 4. Inicie o servidor
 npx expo start
 ```
-
-* Para abrir no **Navegador Web**: pressione a tecla **`w`** no terminal.
-* Para abrir no **Celular (Android ou iOS)**: abra o app **Expo Go** e escaneie o QR Code exibido no terminal.
+* Pressione **`w`** para abrir no navegador web.
+* Ou leia o QR Code no app **Expo Go** no celular.
