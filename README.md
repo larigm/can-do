@@ -10,24 +10,26 @@ A proposta do aplicativo é oferecer uma experiência simples e intuitiva para a
 
 * [x] Criar tarefa
 * [x] Listar e visualizar tarefas
-* [ ] Editar tarefa
 * [x] Marcar tarefa como concluída
-* [ ] Excluir tarefa
 * [x] Definir categoria para a tarefa
 * [x] Definir prioridade da tarefa
-* [ ] Definir data e horário para a tarefa
 * [x] Criar subtarefas dentro de uma tarefa
 * [x] Marcar subtarefas como concluídas
 * [x] Visualizar o progresso diário
 * [x] Visualizar o progresso das subtarefas
+* [ ] Persistir tarefas e subtarefas no banco de dados (SQLite)
+* [ ] Editar tarefa
+* [ ] Excluir tarefa
+* [ ] Definir data e horário para a tarefa
+* [ ] Validar os campos dos formulários
 
 ### Funcionalidades adicionais (trabalhos futuros)
 
+* [ ] Telas não essenciais do protótipo (Todas as tarefas, Progresso, Perfil, Login e Cadastro)
 * [ ] Histórico detalhado de tarefas concluídas
 * [ ] Notificações e lembretes
 * [ ] Personalização das categorias
 * [ ] Tema escuro
-* [ ] Estatísticas mais detalhadas de produtividade
 
 ## Protótipos de tela
 
@@ -35,36 +37,41 @@ Os protótipos do **CanDo** foram desenvolvidos no Figma, seguindo um Design Sys
 
 [Protótipos - CanDo (Figma)](https://www.figma.com/design/LBz7bRwmiWOFjMUBxhAk5m/CanDo?node-id=0-1&t=MYgJB43Y0SSDIezh-1)
 
-### Principais telas
+### Telas essenciais
 
-* Splash Screen
-* Tela inicial / Hoje (`app/index.tsx`)
-* Criar tarefa (`app/new-task.tsx`)
-* Editar tarefa
-* Detalhes da tarefa (`app/task-details.tsx`)
-* Todas as tarefas
-* Progresso
-* Perfil / Configurações
-* Estado vazio (Empty State)
+Telas necessárias para o funcionamento do app (cadastrar, visualizar, editar e acompanhar tarefas):
+
+* [x] Hoje (`app/index.tsx`)
+* [x] Hoje: estado vazio (componente `EmptyState`)
+* [x] Nova tarefa (`app/new-task.tsx`)
+* [x] Detalhes da tarefa (`app/task-details.tsx`)
+* [ ] Editar tarefa
+
+### Telas não essenciais
+
+Telas do protótipo que complementam a experiência, mas o app funciona sem elas:
+
+* [ ] Splash Screen
+* [ ] Todas as tarefas
+* [ ] Progresso
+* [ ] Perfil / Configurações
+* [ ] Login
+* [ ] Cadastro
 
 ### Fluxo principal
 
 ```text
-Splash
-   ↓
 Hoje
    ↓
 Nova tarefa
    ↓
-Preencher tarefa
+Preencher tarefa (e subtarefas, opcional)
    ↓
 Adicionar tarefa
    ↓
 Tarefa aparece na lista
    ↓
 Detalhes da tarefa
-   ↓
-Adicionar subtarefas (opcional)
    ↓
 Marcar tarefa ou subtarefas como concluídas
    ↓
@@ -73,7 +80,7 @@ Progresso atualizado
 
 ## Modelagem do banco de dados (SQLite)
 
-O aplicativo utilizará um banco de dados local **SQLite** para armazenar as tarefas e suas respectivas subtarefas.
+O aplicativo utilizará um banco de dados local **SQLite** (via `expo-sqlite`) para armazenar as tarefas e suas respectivas subtarefas. Não há backend: todos os dados ficam no dispositivo.
 
 ```mermaid
 erDiagram
@@ -84,95 +91,118 @@ erDiagram
         TEXT descricao
         TEXT categoria
         TEXT prioridade
-        DATE data
+        TEXT data
         TEXT horario
-        BOOLEAN concluida
+        INTEGER concluida
     }
     SUBTAREFA {
         INTEGER id PK
         INTEGER tarefa_id FK
         TEXT titulo
-        BOOLEAN concluida
+        INTEGER concluida
     }
 ```
 
-## Atualizações desde o último checkpoint
+> No SQLite não existem tipos `DATE` e `BOOLEAN` nativos: datas são guardadas como `TEXT` (formato `AAAA-MM-DD`) e booleanos como `INTEGER` (0 ou 1).
 
-Neste checkpoint, foi desenvolvida a base arquitetural e visual do CanDo, implementando a navegação com Expo Router, estilização alinhada ao protótipo do Figma, dados mockados e componentes reutilizáveis.
+## Atualizações por checkpoint
 
-### Recursos aplicados dos módulos anteriores
+### Checkpoint 2: roteamento e composição de telas
+
+Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo Router, estilização alinhada ao protótipo do Figma, dados mockados e componentes reutilizáveis.
+
+#### Recursos aplicados dos módulos anteriores
 
 * **Expo Router:** navegação entre telas via `Stack` e roteamento em `app/` com `useRouter`.
-* **TypeScript:** tipagem do modelo de dados (`Task`, `Subtask`) e das props dos componentes.   
+* **TypeScript:** tipagem do modelo de dados (`Task`, `Subtask`) e das props dos componentes.
 * **Google Fonts (Inter):** tipografia do Figma carregada com `@expo-google-fonts/inter`.
 * **Expo Vector Icons:** ícones de navegação, status e botões com `Ionicons`.
-* **Theme / Design Tokens:** centralização de cores e estilos em `constants/theme.ts`.
-* **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas no checkpoint.
+* **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas.
 
-### Boas práticas na criação de componentes
+#### Boas práticas na criação de componentes
 
 * **Responsabilidade Única (SRP):** cada componente tem apenas uma função visual isolada (ex: `TaskCard` para tarefas, `DailyProgressCard` para o progresso, `EmptyState` para estado vazio).
-* **Componentes Apresentacionais (Dumb Components):** recebem dados e emitem ações via `props` (`onPress`, `onToggleComplete`), sem regra de negócio embutida.
-* **Props Tipadas com TypeScript:** uso de `interfaces` em cada componente garantindo consistência e prevenindo erros.
-* **Modularidade e Separação de Pastas:** divisão clara entre rotas (`app/`), componentes (`components/`), tipos (`types/`) e dados (`mocks/`).
+* **Componentes Apresentacionais:** recebem dados e emitem ações via `props` (`onPress`, `onToggleComplete`), sem regra de negócio embutida.
+* **Props Tipadas com TypeScript:** uso de `interfaces` em cada componente.
+* **Modularidade e Separação de Pastas:** divisão entre rotas (`app/`), componentes (`components/`), tipos (`types/`) e dados (`mocks/`).
 
 ## Planejamento de sprints
 
-O desenvolvimento do **CanDo** está planejado em 8 sprints:
+O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 já foram concluídas; o cronograma das demais é:
 
-### Sprint 1 — Planejamento e prototipação
+| Sprint | Período | Duração | Foco |
+|---|---|---|---|
+| 4 | 21/10 a 30/10 | 1,5 semana | Persistência com SQLite |
+| 5 | 02/11 a 08/11 | 1 semana | Editar, excluir e validações |
+| 6 | 09/11 a 20/11 | 2 semanas | Telas não essenciais |
+| 7 | 23/11 a 29/11 | 1 semana | Testes e build do APK |
+| 8 | 30/11 a 04/12 | 1 semana | Finalização e entrega |
+
+### Sprint 1: Planejamento e prototipação (concluída)
 * [x] Definir as funcionalidades essenciais do aplicativo
 * [x] Definir o fluxo de navegação
 * [x] Criar as telas principais no Figma seguindo Design System
 * [x] Criar o protótipo interativo
 * [x] Revisar a experiência de navegação
 
-### Sprint 2 — Estrutura inicial e roteamento (Checkpoint Atual)
+### Sprint 2: Estrutura inicial e roteamento (concluída)
 * [x] Criar o projeto utilizando Expo e TypeScript
 * [x] Configurar o repositório GitHub com branch main e fluxo de PRs
 * [x] Configurar o Expo Router com `app/_layout.tsx`
 * [x] Configurar tipografia Inter com `@expo-google-fonts/inter`
-* [x] Configurar Design Tokens centralizados em `constants/theme.ts`
 * [x] Organizar a estrutura de pastas do projeto
 
-### Sprint 3 — Composição de telas e componentes reutilizáveis (Checkpoint Atual)
+### Sprint 3: Composição de telas e componentes reutilizáveis (concluída)
 * [x] Desenvolver a tela inicial **Hoje** (`app/index.tsx`)
 * [x] Implementar componentes reutilizáveis na pasta `components/`
 * [x] Desenvolver a tela **Nova Tarefa** (`app/new-task.tsx`) com formulário e subtarefas
 * [x] Desenvolver a tela **Detalhes da Tarefa** (`app/task-details.tsx`) com subtarefas interativas
 * [x] Popular as 3 telas com dados mockados (`mocks/types.ts`)
 * [x] Implementar navegação funcional de ida e volta entre as 3 telas
+* [x] Definir o título (`title`) de cada tela no `Stack.Screen`
 
-### Sprint 4 — Modelagem e persistência com SQLite
-* [ ] Configurar SQLite no Expo
-* [ ] Criar tabelas `TAREFA` e `SUBTAREFA`
-* [ ] Implementar operações de CRUD de tarefas (inserir, listar, editar e excluir)
-* [ ] Implementar persistência e alternância de conclusão das subtarefas
-* [ ] Conectar banco de dados às telas existentes
+### Sprint 4: Persistência com SQLite (21/10 a 30/10, 1,5 semana)
+* [ ] Instalar e configurar o `expo-sqlite`
+* [ ] Criar as tabelas `TAREFA` e `SUBTAREFA`
+* [ ] Criar a camada de acesso ao banco (`database/`) com inserir, listar, atualizar e excluir
+* [ ] Conectar a tela **Hoje** ao banco (substituir `MOCK_TASKS`)
+* [ ] Conectar a tela **Nova Tarefa** ao banco
+* [ ] Passar o `id` da tarefa para a tela **Detalhes** pela rota e carregar os dados do banco
+* [ ] Persistir a conclusão de tarefas e subtarefas
 
-### Sprint 5 — Validações e gerenciamento de estado
-* [ ] Implementar validação dos campos na criação de tarefas
-* [ ] Implementar sincronização de estado entre telas
-* [ ] Implementar filtros de tarefas por categoria e status
+### Sprint 5: Editar, excluir e validações (02/11 a 08/11, 1 semana)
+* [ ] Criar a tela **Editar Tarefa** reaproveitando o formulário de Nova Tarefa
+* [ ] Implementar a exclusão de tarefas (com confirmação)
+* [ ] Incluir data e horário no formulário e no banco
+* [ ] Validar os campos dos formulários (título obrigatório, subtarefa vazia etc.) com mensagens de erro
 * [ ] Atualização reativa da barra de progresso diário
 
-### Sprint 6 — Funcionalidades adicionais e refinamento
-* [ ] Desenvolver telas complementares (Todas as tarefas e Progresso)
-* [ ] Implementar filtros de busca por data
-* [ ] Implementar feedback visual (mensagens e animações suaves)
-* [ ] Testes de responsividade em diferentes telas
+### Sprint 6: Telas não essenciais (09/11 a 20/11, 2 semanas)
+* [ ] Desenvolver a tela **Todas as tarefas** (filtro por status)
+* [ ] Desenvolver a tela **Progresso**
+* [ ] Desenvolver a tela **Splash Screen**
+* [ ] Desenvolver a tela **Perfil / Configurações**
+* [ ] Desenvolver as telas **Login** e **Cadastro**, se houver tempo
+* [ ] Implementar feedback visual (mensagens e estados de carregamento)
 
-### Sprint 7 — Testes e estabilização
-* [ ] Testar fluxo completo de tarefas e subtarefas
-* [ ] Testar persistência dos dados ao reabrir o app
-* [ ] Correção de bugs de layout e navegação
-* [ ] Validação com `expo-doctor` e `npx tsc --noEmit`
+### Sprint 7: Testes, build e estabilização (23/11 a 29/11, 1 semana)
+* [ ] Testar o fluxo completo de tarefas e subtarefas
+* [ ] Testar a persistência dos dados ao reabrir o app
+* [ ] Corrigir bugs de layout e navegação
+* [ ] Validar com `expo-doctor` e `npx tsc --noEmit`
+* [ ] Gerar o APK final com EAS Build
+* [ ] Publicar o APK como Release no GitHub
 
-### Sprint 8 — Finalização e entrega
-* [ ] Ajustes finais de interface conforme protótipo do Figma
-* [ ] Atualização final da documentação
-* [ ] Gravação do vídeo final de apresentação
-* [ ] Entrega da versão final do aplicativo
+### Sprint 8: Finalização e entrega (30/11 a 04/12, 1 semana)
+* [ ] Ajustes finais de interface conforme o protótipo do Figma
+* [ ] Atualizar a documentação (marcar tarefas e justificar o que não foi feito)
+* [ ] Gerar o card de destaques do app
+* [ ] Gravar o vídeo final de apresentação
+* [ ] Entregar a versão final do aplicativo
+
+## Tarefas não implementadas e justificativas
+
+
 
 ## Como executar o projeto
 
