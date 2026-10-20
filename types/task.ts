@@ -11,9 +11,11 @@ export interface Subtask {
 export interface Task {
   id: string;
   title: string;
+  description?: string;
   category: TaskCategory;
   priority: TaskPriority;
   date: string;
+  time?: string;
   completed: boolean;
   subtasks: Subtask[];
 }
