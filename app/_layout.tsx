@@ -16,7 +16,6 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  // Enquanto as fontes carregam, exibe um carregamento rápido
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -33,9 +32,18 @@ export default function RootLayout() {
         headerTitleStyle: { fontFamily: "Inter_700Bold" },
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="new-task" options={{ headerShown: false }} />
-      <Stack.Screen name="task-details" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: "Hoje", headerShown: false }}
+      />
+      <Stack.Screen
+        name="new-task"
+        options={{ title: "Nova Tarefa", headerShown: false }}
+      />
+      <Stack.Screen
+        name="task-details"
+        options={{ title: "Detalhes da Tarefa", headerShown: false }}
+      />
     </Stack>
   );
 }
