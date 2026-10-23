@@ -105,11 +105,10 @@ erDiagram
 
 > No SQLite não existem tipos `DATE` e `BOOLEAN` nativos: datas são guardadas como `TEXT` (formato `AAAA-MM-DD`) e booleanos como `INTEGER` (0 ou 1).
 
-## Atualizações por checkpoint
+## Atualizações desde o último checkpoint
 
-### Checkpoint 2: roteamento e composição de telas
+Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo Router, estilização alinhada ao protótipo do Figma, dados mockados, componentes reutilizáveis e a criação de tokens de tema.
 
-Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo Router, estilização alinhada ao protótipo do Figma, dados mockados e componentes reutilizáveis.
 
 #### Recursos aplicados dos módulos anteriores
 
@@ -118,13 +117,15 @@ Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo
 * **Google Fonts (Inter):** tipografia do Figma carregada com `@expo-google-fonts/inter`.
 * **Expo Vector Icons:** ícones de navegação, status e botões com `Ionicons`.
 * **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas.
+* **Theme / Design Tokens:** cores, raios, tamanhos e fontes centralizados em `constants/theme.ts`, aplicados na tela de detalhes.
 
 #### Boas práticas na criação de componentes
 
 * **Responsabilidade Única (SRP):** cada componente tem apenas uma função visual isolada (ex: `TaskCard` para tarefas, `DailyProgressCard` para o progresso, `EmptyState` para estado vazio).
 * **Componentes Apresentacionais:** recebem dados e emitem ações via `props` (`onPress`, `onToggleComplete`), sem regra de negócio embutida.
 * **Props Tipadas com TypeScript:** uso de `interfaces` em cada componente.
-* **Modularidade e Separação de Pastas:** divisão entre rotas (`app/`), componentes (`components/`), tipos (`types/`) e dados (`mocks/`).
+* **Modularidade e Separação de Pastas:** divisão entre rotas (`app/`), componentes (`components/`), tipos (`types/`), dados (`mocks/`), tema (`constants/`) e estilos (`styles/`).
+* **Separação de estilos:** os estilos da tela de detalhes foram movidos para `styles/taskDetails.styles.ts`, deixando o arquivo da tela só com lógica e JSX.
 
 ## Planejamento de sprints
 
@@ -160,6 +161,9 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 j�
 * [x] Popular as 3 telas com dados mockados (`mocks/types.ts`)
 * [x] Implementar navegação funcional de ida e volta entre as 3 telas
 * [x] Definir o título (`title`) de cada tela no `Stack.Screen`
+* [x] Passar o `id` da tarefa para a tela **Detalhes** pela rota (`useLocalSearchParams`)
+* [x] Criar os tokens de tema (`constants/theme.ts`) e aplicá-los na tela de detalhes (`styles/taskDetails.styles.ts`)
+* [ ] Aplicar os tokens de tema e mover os estilos das telas **Hoje** e **Nova Tarefa** para `styles/`
 
 ### Sprint 4: Persistência com SQLite (21/10 a 30/10, 1,5 semana)
 * [ ] Instalar e configurar o `expo-sqlite`
