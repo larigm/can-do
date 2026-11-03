@@ -109,8 +109,7 @@ erDiagram
 
 Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo Router, estilização alinhada ao protótipo do Figma, dados mockados, componentes reutilizáveis e a criação de tokens de tema.
 
-
-#### Recursos aplicados dos módulos anteriores
+### Recursos aplicados dos módulos anteriores
 
 * **Expo Router:** navegação entre telas via `Stack` e roteamento em `app/` com `useRouter`.
 * **TypeScript:** tipagem do modelo de dados (`Task`, `Subtask`) e das props dos componentes.
@@ -119,7 +118,7 @@ Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo
 * **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas.
 * **Theme / Design Tokens:** cores, raios, tamanhos e fontes centralizados em `constants/theme.ts`, aplicados na tela de detalhes.
 
-#### Boas práticas na criação de componentes
+### Boas práticas na criação de componentes
 
 * **Responsabilidade Única (SRP):** cada componente tem apenas uma função visual isolada (ex: `TaskCard` para tarefas, `DailyProgressCard` para o progresso, `EmptyState` para estado vazio).
 * **Componentes Apresentacionais:** recebem dados e emitem ações via `props` (`onPress`, `onToggleComplete`), sem regra de negócio embutida.
@@ -133,11 +132,11 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 j�
 
 | Sprint | Período | Duração | Foco |
 |---|---|---|---|
-| 4 | 21/10 a 30/10 | 1,5 semana | Persistência com SQLite |
-| 5 | 02/11 a 08/11 | 1 semana | Editar, excluir e validações |
-| 6 | 09/11 a 20/11 | 2 semanas | Telas não essenciais |
-| 7 | 23/11 a 29/11 | 1 semana | Testes e build do APK |
-| 8 | 30/11 a 04/12 | 1 semana | Finalização e entrega |
+| 4 | 02/11 a 08/11 | 1 semana | Persistência com SQLite |
+| 5 | 09/11 a 15/11 | 1 semana | Editar, excluir e validações |
+| 6 | 16/11 a 20/11 | 1 semana | Estilos pendentes e telas não essenciais |
+| 7 | 21/11 a 25/11 | 5 dias | Testes e build do APK |
+| 8 | 26/11 a 28/11 | 3 dias | Card de destaques, vídeo e entrega |
 
 ### Sprint 1: Planejamento e prototipação (concluída)
 * [x] Definir as funcionalidades essenciais do aplicativo
@@ -163,33 +162,37 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 j�
 * [x] Definir o título (`title`) de cada tela no `Stack.Screen`
 * [x] Passar o `id` da tarefa para a tela **Detalhes** pela rota (`useLocalSearchParams`)
 * [x] Criar os tokens de tema (`constants/theme.ts`) e aplicá-los na tela de detalhes (`styles/taskDetails.styles.ts`)
-* [ ] Aplicar os tokens de tema e mover os estilos das telas **Hoje** e **Nova Tarefa** para `styles/`
 
-### Sprint 4: Persistência com SQLite (21/10 a 30/10, 1,5 semana)
+### Sprint 4: Persistência com SQLite (02/11 a 08/11)
+* [x] Gerar a data e a semana da tela **Hoje** a partir de `new Date()`
+* [ ] Usar o tema (`colors.primary`) no `_layout.tsx` em vez de cores fixas
 * [ ] Instalar e configurar o `expo-sqlite`
 * [ ] Criar as tabelas `TAREFA` e `SUBTAREFA`
 * [ ] Criar a camada de acesso ao banco (`database/`) com inserir, listar, atualizar e excluir
+* [ ] Criar hooks (ex.: `useTasks`) para isolar o acesso ao banco das telas
 * [ ] Conectar a tela **Hoje** ao banco (substituir `MOCK_TASKS`)
 * [ ] Conectar a tela **Nova Tarefa** ao banco
-* [ ] Passar o `id` da tarefa para a tela **Detalhes** pela rota e carregar os dados do banco
+* [ ] Carregar os dados da tela **Detalhes** a partir do banco, usando o `id` da rota
 * [ ] Persistir a conclusão de tarefas e subtarefas
 
-### Sprint 5: Editar, excluir e validações (02/11 a 08/11, 1 semana)
+### Sprint 5: Editar, excluir e validações (09/11 a 15/11)
 * [ ] Criar a tela **Editar Tarefa** reaproveitando o formulário de Nova Tarefa
 * [ ] Implementar a exclusão de tarefas (com confirmação)
 * [ ] Incluir data e horário no formulário e no banco
 * [ ] Validar os campos dos formulários (título obrigatório, subtarefa vazia etc.) com mensagens de erro
 * [ ] Atualização reativa da barra de progresso diário
+* [ ] Mostrar o ponto do seletor de semana apenas nos dias que têm tarefa
 
-### Sprint 6: Telas não essenciais (09/11 a 20/11, 2 semanas)
+### Sprint 6: Estilos pendentes e telas não essenciais (16/11 a 20/11)
+* [ ] Aplicar os tokens de tema e mover os estilos das telas **Hoje** e **Nova Tarefa** para `styles/`
 * [ ] Desenvolver a tela **Todas as tarefas** (filtro por status)
 * [ ] Desenvolver a tela **Progresso**
 * [ ] Desenvolver a tela **Splash Screen**
-* [ ] Desenvolver a tela **Perfil / Configurações**
-* [ ] Desenvolver as telas **Login** e **Cadastro**, se houver tempo
+* [ ] Desenvolver as telas **Perfil**, **Login** e **Cadastro**, se houver tempo
 * [ ] Implementar feedback visual (mensagens e estados de carregamento)
 
-### Sprint 7: Testes, build e estabilização (23/11 a 29/11, 1 semana)
+### Sprint 7: Testes, build e estabilização (21/11 a 25/11)
+* [ ] Gerar um APK de teste com EAS Build no início da sprint
 * [ ] Testar o fluxo completo de tarefas e subtarefas
 * [ ] Testar a persistência dos dados ao reabrir o app
 * [ ] Corrigir bugs de layout e navegação
@@ -197,7 +200,7 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 j�
 * [ ] Gerar o APK final com EAS Build
 * [ ] Publicar o APK como Release no GitHub
 
-### Sprint 8: Finalização e entrega (30/11 a 04/12, 1 semana)
+### Sprint 8: Finalização e entrega (26/11 a 28/11)
 * [ ] Ajustes finais de interface conforme o protótipo do Figma
 * [ ] Atualizar a documentação (marcar tarefas e justificar o que não foi feito)
 * [ ] Gerar o card de destaques do app
@@ -206,7 +209,7 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 j�
 
 ## Tarefas não implementadas e justificativas
 
-
+Até o momento, nenhuma tarefa foi deixada de fora. Esta seção é atualizada ao final de cada sprint com o que for adiado e o motivo.
 
 ## Como executar o projeto
 
