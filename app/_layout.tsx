@@ -7,7 +7,7 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { ActivityIndicator, View } from "react-native";
-
+import { colors, fonts } from "../constants/theme";
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -19,7 +19,7 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#5B6BFE" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -27,9 +27,9 @@ export default function RootLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: "#5B6BFE" },
-        headerTintColor: "#FFFFFF",
-        headerTitleStyle: { fontFamily: "Inter_700Bold" },
+        headerStyle: { backgroundColor: colors.primary },
+        headerTintColor: colors.surface,
+        headerTitleStyle: { fontFamily: fonts.bold },
       }}
     >
       <Stack.Screen
