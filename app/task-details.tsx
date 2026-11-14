@@ -1,5 +1,5 @@
 //detalhes das tarefas
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,8 +10,7 @@ import {
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBar } from "../components/BottomTabBar";
-import { MOCK_TASKS } from "../mocks/types";
-import { Subtask } from "../types/task";
+import { useTask } from "../hooks/useTask";
 import { colors } from "../constants/theme";
 import { styles } from "../styles/taskDetails.styles";
 
@@ -37,25 +36,13 @@ function formatDate(date: string) {
 
 export default function TaskDetailsScreen() {
   const router = useRouter();
-
-  // Pega o id que veio pela rota e busca a tarefa no mock
   const { id } = useLocalSearchParams<{ id: string }>();
-  const task = MOCK_TASKS.find((t) => t.id === id);
+  const { task, loading, toggleTask, toggleSubtask, addSubtask } = useTask(id);
 
-  const [isTaskCompleted, setIsTaskCompleted] = useState(
-    task?.completed ?? false,
-  );
-  const [subtasks, setSubtasks] = useState<Subtask[]>(task?.subtasks ?? []);
-
-  const handleToggleSubtask = (subId: string) => {
-    setSubtasks((prev) =>
-      prev.map((sub) =>
-        sub.id === subId ? { ...sub, completed: !sub.completed } : sub,
-      ),
-    );
-  };
-
-  const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
+  // Enquanto carrega do banco, mostra a tela vazia
+  if (loading) {
+    return <SafeAreaView style={styles.safeArea} />;
+  }
 
   if (!task) {
     return (
@@ -68,6 +55,9 @@ export default function TaskDetailsScreen() {
       </SafeAreaView>
     );
   }
+
+  const subtasks = task.subtasks;
+  const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -111,11 +101,11 @@ export default function TaskDetailsScreen() {
               <TouchableOpacity
                 style={[
                   styles.mainCheckbox,
-                  isTaskCompleted && styles.mainCheckboxCompleted,
+                  task.completed && styles.mainCheckboxCompleted,
                 ]}
-                onPress={() => setIsTaskCompleted(!isTaskCompleted)}
+                onPress={toggleTask}
               >
-                {isTaskCompleted && (
+                {task.completed && (
                   <Ionicons name="checkmark" size={16} color={colors.surface} />
                 )}
               </TouchableOpacity>
@@ -124,7 +114,7 @@ export default function TaskDetailsScreen() {
                 <Text
                   style={[
                     styles.taskTitle,
-                    isTaskCompleted && styles.taskTitleDone,
+                    task.completed && styles.taskTitleDone,
                   ]}
                 >
                   {task.title}
@@ -191,7 +181,7 @@ export default function TaskDetailsScreen() {
                 <TouchableOpacity
                   key={item.id}
                   style={styles.subtaskRow}
-                  onPress={() => handleToggleSubtask(item.id)}
+                  onPress={() => toggleSubtask(item.id)}
                   activeOpacity={0.7}
                 >
                   {item.completed ? (
@@ -221,13 +211,7 @@ export default function TaskDetailsScreen() {
           {/* Botões de Ação */}
           <TouchableOpacity
             style={styles.addSubtaskButton}
-            onPress={() => {
-              const novoTitulo = `Nova subtarefa ${subtasks.length + 1}`;
-              setSubtasks([
-                ...subtasks,
-                { id: String(Date.now()), title: novoTitulo, completed: false },
-              ]);
-            }}
+            onPress={() => addSubtask(`Nova subtarefa ${subtasks.length + 1}`)}
             activeOpacity={0.8}
           >
             <Text style={styles.addSubtaskButtonText}>
