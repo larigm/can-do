@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,15 +10,22 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
 import { createTask } from "../database/tasks";
+import { useTask } from "../hooks/useTask";
 import { TaskCategory } from "../types/task";
 
 export default function NewTaskScreen() {
   const router = useRouter();
   const db = useSQLiteContext();
+
+  // Se vier um id pela rota, a tela funciona como edição
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEditing = !!id;
+  const { task: taskToEdit, editTask } = useTask(id);
+
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Estudos");
@@ -40,6 +47,14 @@ export default function NewTaskScreen() {
     "+ Nova",
   ];
 
+  // No modo edição, preenche o formulário com os dados da tarefa
+  useEffect(() => {
+    if (!taskToEdit) return;
+    setTaskName(taskToEdit.title);
+    setDescription(taskToEdit.description ?? "");
+    setSelectedCategory(taskToEdit.category);
+    setSelectedPriority(taskToEdit.priority);
+  }, [taskToEdit]);
 
   const handleAddSubtask = () => {
     if (newSubtaskInput.trim()) {
@@ -54,19 +69,24 @@ export default function NewTaskScreen() {
   };
 
   const handleCreateTask = async () => {
-  // Proteção básica; as validações com mensagem de erro entram na Sprint 5
-  if (!taskName.trim()) return;
+    // Proteção básica; as validações com mensagem de erro entram depois
+    if (!taskName.trim()) return;
 
-  await createTask(db, {
-    title: taskName.trim(),
-    description: description.trim() || undefined,
-    category: selectedCategory as TaskCategory,
-    priority: selectedPriority,
-    subtasks,
-  });
+    const data = {
+      title: taskName.trim(),
+      description: description.trim() || undefined,
+      category: selectedCategory as TaskCategory,
+      priority: selectedPriority,
+    };
 
-  router.back();
-};
+    if (isEditing) {
+      await editTask(data);
+    } else {
+      await createTask(db, { ...data, subtasks });
+    }
+
+    router.back();
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -80,7 +100,9 @@ export default function NewTaskScreen() {
           >
             <Ionicons name="arrow-back" size={22} color="#0F172A" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Nova tarefa</Text>
+          <Text style={styles.headerTitle}>
+            {isEditing ? "Editar tarefa" : "Nova tarefa"}
+          </Text>
         </View>
 
         <ScrollView
@@ -186,52 +208,56 @@ export default function NewTaskScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Subtarefas */}
-          <Text style={styles.label}>Subtarefas (opcional)</Text>
+          {/* Subtarefas (só ao criar; na edição são gerenciadas nos detalhes) */}
+          {!isEditing && (
+            <>
+              <Text style={styles.label}>Subtarefas (opcional)</Text>
 
-          {/* Lista de subtarefas criadas */}
-          {subtasks.map((item, index) => (
-            <View key={index} style={styles.subtaskItem}>
-              <View style={styles.subtaskContent}>
-                <Ionicons
-                  name="checkbox-outline"
-                  size={18}
-                  color="#5B6BFE"
-                  style={{ marginRight: 10 }}
+              {/* Lista de subtarefas criadas */}
+              {subtasks.map((item, index) => (
+                <View key={index} style={styles.subtaskItem}>
+                  <View style={styles.subtaskContent}>
+                    <Ionicons
+                      name="checkbox-outline"
+                      size={18}
+                      color="#5B6BFE"
+                      style={{ marginRight: 10 }}
+                    />
+                    <Text style={styles.subtaskText}>{item}</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveSubtask(index)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={20}
+                      color="#94A3B8"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+
+              {/* Campo para adicionar nova subtarefa */}
+              <View style={styles.addSubtaskRow}>
+                <TextInput
+                  style={[styles.input, styles.subtaskInput]}
+                  placeholder="Adicionar subtarefa..."
+                  placeholderTextColor="#94A3B8"
+                  value={newSubtaskInput}
+                  onChangeText={setNewSubtaskInput}
+                  onSubmitEditing={handleAddSubtask}
                 />
-                <Text style={styles.subtaskText}>{item}</Text>
+                <TouchableOpacity
+                  style={styles.addSubtaskButton}
+                  onPress={handleAddSubtask}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="add" size={24} color="#FFFFFF" />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                onPress={() => handleRemoveSubtask(index)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Ionicons
-                  name="close-circle-outline"
-                  size={20}
-                  color="#94A3B8"
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          {/* Campo para adicionar nova subtarefa */}
-          <View style={styles.addSubtaskRow}>
-            <TextInput
-              style={[styles.input, styles.subtaskInput]}
-              placeholder="Adicionar subtarefa..."
-              placeholderTextColor="#94A3B8"
-              value={newSubtaskInput}
-              onChangeText={setNewSubtaskInput}
-              onSubmitEditing={handleAddSubtask}
-            />
-            <TouchableOpacity
-              style={styles.addSubtaskButton}
-              onPress={handleAddSubtask}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
+            </>
+          )}
 
           {/* Data */}
           <Text style={styles.label}>Data</Text>
@@ -248,13 +274,15 @@ export default function NewTaskScreen() {
             <Ionicons name="chevron-down" size={20} color="#64748B" />
           </TouchableOpacity>
 
-          {/* Botão Adicionar Tarefa */}
+          {/* Botão Adicionar / Salvar */}
           <TouchableOpacity
             style={styles.submitButton}
             onPress={handleCreateTask}
             activeOpacity={0.8}
           >
-            <Text style={styles.submitButtonText}>Adicionar tarefa</Text>
+            <Text style={styles.submitButtonText}>
+              {isEditing ? "Salvar alterações" : "Adicionar tarefa"}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

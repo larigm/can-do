@@ -8,6 +8,8 @@ import {
   insertSubtask,
   toggleSubtaskCompleted,
   toggleTaskCompleted,
+  updateTask,
+  type UpdateTaskInput,
 } from "../database/tasks";
 
 export function useTask(id: string | undefined) {
@@ -47,6 +49,18 @@ export function useTask(id: string | undefined) {
     if (!task) return;
     await deleteTask(db, task.id);
   };
+  const editTask = async (input: UpdateTaskInput) => {
+    if (!task) return;
+    await updateTask(db, task.id, input);
+  };
 
-  return { task, loading, toggleTask, toggleSubtask, addSubtask, removeTask };
+  return {
+    task,
+    loading,
+    toggleTask,
+    toggleSubtask,
+    addSubtask,
+    removeTask,
+    editTask,
+  };
 }
