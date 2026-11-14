@@ -17,7 +17,7 @@ A proposta do aplicativo é oferecer uma experiência simples e intuitiva para a
 * [x] Marcar subtarefas como concluídas
 * [x] Visualizar o progresso diário
 * [x] Visualizar o progresso das subtarefas
-* [ ] Persistir tarefas e subtarefas no banco de dados (SQLite)
+* [x] Persistir tarefas e subtarefas no banco de dados (SQLite)
 * [ ] Editar tarefa
 * [ ] Excluir tarefa
 * [ ] Definir data e horário para a tarefa
@@ -80,30 +80,32 @@ Progresso atualizado
 
 ## Modelagem do banco de dados (SQLite)
 
-O aplicativo utilizará um banco de dados local **SQLite** (via `expo-sqlite`) para armazenar as tarefas e suas respectivas subtarefas. Não há backend: todos os dados ficam no dispositivo.
+O aplicativo utiliza um banco de dados local **SQLite** (via `expo-sqlite`) para armazenar as tarefas e suas respectivas subtarefas. Não há backend: todos os dados ficam no dispositivo.
 
 ```mermaid
 erDiagram
-    TAREFA ||--o{ SUBTAREFA : possui
-    TAREFA {
+    tasks ||--o{ subtasks : possui
+    tasks {
         INTEGER id PK
-        TEXT titulo
-        TEXT descricao
-        TEXT categoria
-        TEXT prioridade
-        TEXT data
-        TEXT horario
-        INTEGER concluida
+        TEXT title
+        TEXT description
+        TEXT category
+        TEXT priority
+        TEXT date
+        TEXT time
+        INTEGER completed
     }
-    SUBTAREFA {
+    subtasks {
         INTEGER id PK
-        INTEGER tarefa_id FK
-        TEXT titulo
-        INTEGER concluida
+        INTEGER task_id FK
+        TEXT title
+        INTEGER completed
     }
 ```
 
 > No SQLite não existem tipos `DATE` e `BOOLEAN` nativos: datas são guardadas como `TEXT` (formato `AAAA-MM-DD`) e booleanos como `INTEGER` (0 ou 1).
+
+> Os nomes das tabelas e colunas foram padronizados em inglês, igual ao código (`tasks`, `subtasks`, `title`...). A estrutura é a mesma planejada inicialmente. A única diferença é o relacionamento: `ON DELETE CASCADE` em `subtasks.task_id`, para apagar as subtarefas junto com a tarefa.
 
 ## Atualizações desde o último checkpoint
 
@@ -128,11 +130,11 @@ Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo
 
 ## Planejamento de sprints
 
-O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 já foram concluídas; o cronograma das demais é:
+O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 4 já foram concluídas; o cronograma das demais é:
 
 | Sprint | Período | Duração | Foco |
 |---|---|---|---|
-| 4 | 02/11 a 08/11 | 1 semana | Persistência com SQLite |
+| 4 | 02/11 a 08/11 | 1 semana | Persistência com SQLite (concluída) |
 | 5 | 09/11 a 15/11 | 1 semana | Editar, excluir e validações |
 | 6 | 16/11 a 20/11 | 1 semana | Estilos pendentes e telas não essenciais |
 | 7 | 21/11 a 25/11 | 5 dias | Testes e build do APK |
@@ -163,17 +165,17 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 3 j�
 * [x] Passar o `id` da tarefa para a tela **Detalhes** pela rota (`useLocalSearchParams`)
 * [x] Criar os tokens de tema (`constants/theme.ts`) e aplicá-los na tela de detalhes (`styles/taskDetails.styles.ts`)
 
-### Sprint 4: Persistência com SQLite (02/11 a 08/11)
+### Sprint 4: Persistência com SQLite (concluída)
 * [x] Gerar a data e a semana da tela **Hoje** a partir de `new Date()`
-* [ ] Usar o tema (`colors.primary`) no `_layout.tsx` em vez de cores fixas
-* [ ] Instalar e configurar o `expo-sqlite`
-* [ ] Criar as tabelas `TAREFA` e `SUBTAREFA`
-* [ ] Criar a camada de acesso ao banco (`database/`) com inserir, listar, atualizar e excluir
-* [ ] Criar hooks (ex.: `useTasks`) para isolar o acesso ao banco das telas
-* [ ] Conectar a tela **Hoje** ao banco (substituir `MOCK_TASKS`)
-* [ ] Conectar a tela **Nova Tarefa** ao banco
-* [ ] Carregar os dados da tela **Detalhes** a partir do banco, usando o `id` da rota
-* [ ] Persistir a conclusão de tarefas e subtarefas
+* [x] Usar o tema (`colors.primary`) no `_layout.tsx` em vez de cores fixas
+* [x] Instalar e configurar o `expo-sqlite`
+* [x] Criar as tabelas `tasks` e `subtasks`
+* [x] Criar a camada de acesso ao banco (`database/`) com funções de listar, criar e concluir
+* [x] Criar hooks (`useTasks` e `useTask`) para isolar o acesso ao banco das telas
+* [x] Conectar a tela **Hoje** ao banco (substituir `MOCK_TASKS`)
+* [x] Conectar a tela **Nova Tarefa** ao banco
+* [x] Carregar os dados da tela **Detalhes** a partir do banco, usando o `id` da rota
+* [x] Persistir a conclusão de tarefas e subtarefas
 
 ### Sprint 5: Editar, excluir e validações (09/11 a 15/11)
 * [ ] Criar a tela **Editar Tarefa** reaproveitando o formulário de Nova Tarefa
