@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,7 +38,8 @@ function formatDate(date: string) {
 export default function TaskDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { task, loading, toggleTask, toggleSubtask, addSubtask } = useTask(id);
+  const { task, loading, toggleTask, toggleSubtask, addSubtask, removeTask } =
+    useTask(id);
 
   // Enquanto carrega do banco, mostra a tela vazia
   if (loading) {
@@ -58,6 +60,24 @@ export default function TaskDetailsScreen() {
 
   const subtasks = task.subtasks;
   const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Excluir tarefa",
+      "Tem certeza que deseja excluir esta tarefa?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            await removeTask();
+            router.back();
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -229,7 +249,7 @@ export default function TaskDetailsScreen() {
 
           <TouchableOpacity
             style={styles.deleteTaskButton}
-            onPress={() => router.back()}
+            onPress={handleDelete}
             activeOpacity={0.8}
           >
             <Text style={styles.deleteTaskButtonText}>Excluir tarefa</Text>

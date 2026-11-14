@@ -135,3 +135,10 @@ export async function insertSubtask(
     title,
   );
 }
+// Apaga a tarefa e as subtarefas dela
+export async function deleteTask(db: SQLiteDatabase, id: string) {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync("DELETE FROM subtasks WHERE task_id = ?", Number(id));
+    await db.runAsync("DELETE FROM tasks WHERE id = ?", Number(id));
+  });
+}
