@@ -10,9 +10,8 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
+import { useTasks } from "../hooks/useTasks";
 import { useRouter } from "expo-router";
-import { MOCK_TASKS } from "../mocks/types";
-import { Task } from "../types/task";
 import { HeaderGreeting } from "../components/HeaderGreeting";
 import { WeekDaySelector, DayItem } from "../components/WeekDaySelector";
 import { DailyProgressCard } from "../components/DailyProgressCard";
@@ -71,7 +70,7 @@ function getWeekDays(): DayItem[] {
 }
 export default function HomeScreen() {
   const router = useRouter();
-  const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
+  const { tasks, toggleTask } = useTasks();
   const [days, setDays] = useState<DayItem[]>(getWeekDays);
 
   const handleSelectDay = (dayNumber: number) => {
@@ -80,13 +79,7 @@ export default function HomeScreen() {
     );
   };
 
-  const handleToggleTask = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, completed: !t.completed } : t,
-      ),
-    );
-  };
+ 
 
   const completedCount = tasks.filter((t) => t.completed).length;
   const totalCount = tasks.length;
@@ -120,7 +113,7 @@ export default function HomeScreen() {
               <TaskCard
                 key={task.id}
                 task={task}
-                onToggleComplete={handleToggleTask}
+                onToggleComplete={toggleTask}
                 onPressDetails={(id) =>
                   router.push({ pathname: "/task-details", params: { id } })
                 }

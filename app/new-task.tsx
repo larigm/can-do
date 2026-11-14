@@ -12,10 +12,13 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSQLiteContext } from "expo-sqlite";
+import { createTask } from "../database/tasks";
+import { TaskCategory } from "../types/task";
 
 export default function NewTaskScreen() {
   const router = useRouter();
-
+  const db = useSQLiteContext();
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Estudos");
@@ -24,9 +27,7 @@ export default function NewTaskScreen() {
   >("alta");
 
   // Estados das subtarefas
-  const [subtasks, setSubtasks] = useState<string[]>([
-    "Revisar anotações da aula", // Exemplo inicial pré-preenchido
-  ]);
+  const [subtasks, setSubtasks] = useState<string[]>([]);
   const [newSubtaskInput, setNewSubtaskInput] = useState("");
 
   const categories = [
@@ -52,10 +53,20 @@ export default function NewTaskScreen() {
     setSubtasks(subtasks.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleCreateTask = () => {
-    // Retorna para a tela anterior
-    router.back();
-  };
+  const handleCreateTask = async () => {
+  // Proteção básica; as validações com mensagem de erro entram na Sprint 5
+  if (!taskName.trim()) return;
+
+  await createTask(db, {
+    title: taskName.trim(),
+    description: description.trim() || undefined,
+    category: selectedCategory as TaskCategory,
+    priority: selectedPriority,
+    subtasks,
+  });
+
+  router.back();
+};
 
   return (
     <SafeAreaView style={styles.safeArea}>
