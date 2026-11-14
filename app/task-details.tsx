@@ -241,7 +241,9 @@ export default function TaskDetailsScreen() {
 
           <TouchableOpacity
             style={styles.editTaskButton}
-            onPress={() => router.push("/new-task")}
+            onPress={() =>
+              router.push({ pathname: "/new-task", params: { id: task.id } })
+            }
             activeOpacity={0.8}
           >
             <Text style={styles.editTaskButtonText}>Editar tarefa</Text>

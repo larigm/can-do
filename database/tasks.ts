@@ -142,3 +142,25 @@ export async function deleteTask(db: SQLiteDatabase, id: string) {
     await db.runAsync("DELETE FROM tasks WHERE id = ?", Number(id));
   });
 }
+export interface UpdateTaskInput {
+  title: string;
+  description?: string;
+  category: TaskCategory;
+  priority: TaskPriority;
+}
+
+// Atualiza os dados principais de uma tarefa
+export async function updateTask(
+  db: SQLiteDatabase,
+  id: string,
+  input: UpdateTaskInput,
+) {
+  await db.runAsync(
+    "UPDATE tasks SET title = ?, description = ?, category = ?, priority = ? WHERE id = ?",
+    input.title,
+    input.description ?? null,
+    input.category,
+    input.priority,
+    Number(id),
+  );
+}
