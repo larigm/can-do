@@ -3,6 +3,7 @@ import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { Task } from "../types/task";
 import {
+  deleteTask,
   getTaskById,
   insertSubtask,
   toggleSubtaskCompleted,
@@ -42,5 +43,10 @@ export function useTask(id: string | undefined) {
     await loadTask();
   };
 
-  return { task, loading, toggleTask, toggleSubtask, addSubtask };
+  const removeTask = async () => {
+    if (!task) return;
+    await deleteTask(db, task.id);
+  };
+
+  return { task, loading, toggleTask, toggleSubtask, addSubtask, removeTask };
 }
