@@ -18,8 +18,8 @@ A proposta do aplicativo é oferecer uma experiência simples e intuitiva para a
 * [x] Visualizar o progresso diário
 * [x] Visualizar o progresso das subtarefas
 * [x] Persistir tarefas e subtarefas no banco de dados (SQLite)
-* [ ] Editar tarefa
-* [ ] Excluir tarefa
+* [x] Editar tarefa
+* [x] Excluir tarefa
 * [ ] Definir data e horário para a tarefa
 * [ ] Validar os campos dos formulários
 
@@ -45,7 +45,7 @@ Telas necessárias para o funcionamento do app (cadastrar, visualizar, editar e 
 * [x] Hoje: estado vazio (componente `EmptyState`)
 * [x] Nova tarefa (`app/new-task.tsx`)
 * [x] Detalhes da tarefa (`app/task-details.tsx`)
-* [ ] Editar tarefa
+* [x] Editar tarefa (`app/new-task.tsx` reaproveitado em modo edição)
 
 ### Telas não essenciais
 
@@ -178,11 +178,11 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 4 j�
 * [x] Persistir a conclusão de tarefas e subtarefas
 
 ### Sprint 5: Editar, excluir e validações (09/11 a 15/11)
-* [ ] Criar a tela **Editar Tarefa** reaproveitando o formulário de Nova Tarefa
-* [ ] Implementar a exclusão de tarefas (com confirmação)
+* [x] Criar a tela **Editar Tarefa** reaproveitando o formulário de Nova Tarefa
+* [x] Implementar a exclusão de tarefas (com confirmação)
 * [ ] Incluir data e horário no formulário e no banco
 * [ ] Validar os campos dos formulários (título obrigatório, subtarefa vazia etc.) com mensagens de erro
-* [ ] Atualização reativa da barra de progresso diário
+* [x] Atualização reativa da barra de progresso diário
 * [ ] Mostrar o ponto do seletor de semana apenas nos dias que têm tarefa
 
 ### Sprint 6: Estilos pendentes e telas não essenciais (16/11 a 20/11)
