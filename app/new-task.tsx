@@ -17,6 +17,13 @@ import { createTask } from "../database/tasks";
 import { useTask } from "../hooks/useTask";
 import { TaskCategory } from "../types/task";
 
+interface FormErrors {
+  title?: string;
+  description?: string;
+  category?: string;
+  subtask?: string;
+}
+
 export default function NewTaskScreen() {
   const router = useRouter();
   const db = useSQLiteContext();
@@ -37,6 +44,9 @@ export default function NewTaskScreen() {
   const [subtasks, setSubtasks] = useState<string[]>([]);
   const [newSubtaskInput, setNewSubtaskInput] = useState("");
 
+  // Mensagens de erro de validação
+  const [errors, setErrors] = useState<FormErrors>({});
+
   const categories = [
     "Estudos",
     "Leitura",
@@ -56,11 +66,29 @@ export default function NewTaskScreen() {
     setSelectedPriority(taskToEdit.priority);
   }, [taskToEdit]);
 
+  // Remove a mensagem de erro de um campo quando o usuário volta a mexer nele
+  const clearError = (field: keyof FormErrors) => {
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
   const handleAddSubtask = () => {
-    if (newSubtaskInput.trim()) {
-      setSubtasks([...subtasks, newSubtaskInput.trim()]);
-      setNewSubtaskInput("");
+    const title = newSubtaskInput.trim();
+
+    if (!title) {
+      setErrors((prev) => ({ ...prev, subtask: "Digite o nome da subtarefa." }));
+      return;
     }
+    if (subtasks.some((s) => s.toLowerCase() === title.toLowerCase())) {
+      setErrors((prev) => ({
+        ...prev,
+        subtask: "Essa subtarefa já foi adicionada.",
+      }));
+      return;
+    }
+
+    setSubtasks([...subtasks, title]);
+    setNewSubtaskInput("");
+    clearError("subtask");
   };
 
   // Função para remover subtarefa
@@ -68,9 +96,33 @@ export default function NewTaskScreen() {
     setSubtasks(subtasks.filter((_, index) => index !== indexToRemove));
   };
 
+  // Valida o formulário e guarda as mensagens de erro
+  const validate = (): boolean => {
+    const newErrors: FormErrors = {};
+    const title = taskName.trim();
+
+    if (!title) {
+      newErrors.title = "O nome da tarefa é obrigatório.";
+    } else if (title.length < 3) {
+      newErrors.title = "O nome precisa ter pelo menos 3 caracteres.";
+    } else if (title.length > 60) {
+      newErrors.title = "O nome pode ter no máximo 60 caracteres.";
+    }
+
+    if (description.trim().length > 200) {
+      newErrors.description = "A descrição pode ter no máximo 200 caracteres.";
+    }
+
+    if (selectedCategory === "+ Nova") {
+      newErrors.category = "Escolha uma das categorias disponíveis.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleCreateTask = async () => {
-    // Proteção básica; as validações com mensagem de erro entram depois
-    if (!taskName.trim()) return;
+    if (!validate()) return;
 
     const data = {
       title: taskName.trim(),
@@ -108,29 +160,44 @@ export default function NewTaskScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Nome da tarefa */}
           <Text style={styles.label}>Nome da tarefa</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.title && styles.inputError]}
             placeholder="Ex: Estudar para a prova"
             placeholderTextColor="#94A3B8"
             value={taskName}
-            onChangeText={setTaskName}
+            onChangeText={(text) => {
+              setTaskName(text);
+              clearError("title");
+            }}
           />
+          {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
 
           {/* Descrição */}
           <Text style={styles.label}>Descrição (opcional)</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[
+              styles.input,
+              styles.textArea,
+              errors.description && styles.inputError,
+            ]}
             placeholder="Adicione detalhes sobre a tarefa..."
             placeholderTextColor="#94A3B8"
             value={description}
-            onChangeText={setDescription}
+            onChangeText={(text) => {
+              setDescription(text);
+              clearError("description");
+            }}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
           />
+          {errors.description && (
+            <Text style={styles.errorText}>{errors.description}</Text>
+          )}
 
           {/* Categoria */}
           <Text style={styles.label}>Categoria</Text>
@@ -144,7 +211,10 @@ export default function NewTaskScreen() {
                     styles.categoryChip,
                     isSelected && styles.categoryChipSelected,
                   ]}
-                  onPress={() => setSelectedCategory(category)}
+                  onPress={() => {
+                    setSelectedCategory(category);
+                    clearError("category");
+                  }}
                   activeOpacity={0.7}
                 >
                   <Text
@@ -159,6 +229,9 @@ export default function NewTaskScreen() {
               );
             })}
           </View>
+          {errors.category && (
+            <Text style={styles.errorText}>{errors.category}</Text>
+          )}
 
           {/* Prioridade */}
           <Text style={styles.label}>Prioridade</Text>
@@ -241,11 +314,18 @@ export default function NewTaskScreen() {
               {/* Campo para adicionar nova subtarefa */}
               <View style={styles.addSubtaskRow}>
                 <TextInput
-                  style={[styles.input, styles.subtaskInput]}
+                  style={[
+                    styles.input,
+                    styles.subtaskInput,
+                    errors.subtask && styles.inputError,
+                  ]}
                   placeholder="Adicionar subtarefa..."
                   placeholderTextColor="#94A3B8"
                   value={newSubtaskInput}
-                  onChangeText={setNewSubtaskInput}
+                  onChangeText={(text) => {
+                    setNewSubtaskInput(text);
+                    clearError("subtask");
+                  }}
                   onSubmitEditing={handleAddSubtask}
                 />
                 <TouchableOpacity
@@ -256,6 +336,9 @@ export default function NewTaskScreen() {
                   <Ionicons name="add" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
+              {errors.subtask && (
+                <Text style={styles.errorText}>{errors.subtask}</Text>
+              )}
             </>
           )}
 
@@ -343,6 +426,14 @@ const styles = StyleSheet.create({
     color: "#0F172A",
     borderWidth: 1,
     borderColor: "#F1F5F9",
+  },
+  inputError: {
+    borderColor: "#EF4444",
+  },
+  errorText: {
+    color: "#EF4444",
+    fontSize: 13,
+    marginTop: 6,
   },
   textArea: {
     height: 100,
