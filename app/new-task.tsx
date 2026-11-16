@@ -16,13 +16,22 @@ import { useSQLiteContext } from "expo-sqlite";
 import { createTask } from "../database/tasks";
 import { useTask } from "../hooks/useTask";
 import { TaskCategory } from "../types/task";
+import {
+  formatDateLabel,
+  getDateOption,
+  getNextDays,
+  getTodayISO,
+} from "../utils/date";
 
 interface FormErrors {
   title?: string;
   description?: string;
   category?: string;
   subtask?: string;
+  time?: string;
 }
+
+const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export default function NewTaskScreen() {
   const router = useRouter();
@@ -39,6 +48,8 @@ export default function NewTaskScreen() {
   const [selectedPriority, setSelectedPriority] = useState<
     "baixa" | "media" | "alta"
   >("alta");
+  const [selectedDate, setSelectedDate] = useState(getTodayISO());
+  const [time, setTime] = useState("");
 
   // Estados das subtarefas
   const [subtasks, setSubtasks] = useState<string[]>([]);
@@ -57,6 +68,12 @@ export default function NewTaskScreen() {
     "+ Nova",
   ];
 
+  // Hoje e os próximos 13 dias (na edição, inclui a data atual da tarefa)
+  const nextDays = getNextDays(14);
+  const dateOptions = nextDays.some((d) => d.iso === selectedDate)
+    ? nextDays
+    : [getDateOption(selectedDate), ...nextDays];
+
   // No modo edição, preenche o formulário com os dados da tarefa
   useEffect(() => {
     if (!taskToEdit) return;
@@ -64,11 +81,22 @@ export default function NewTaskScreen() {
     setDescription(taskToEdit.description ?? "");
     setSelectedCategory(taskToEdit.category);
     setSelectedPriority(taskToEdit.priority);
+    setSelectedDate(taskToEdit.date);
+    setTime(taskToEdit.time ?? "");
   }, [taskToEdit]);
 
   // Remove a mensagem de erro de um campo quando o usuário volta a mexer nele
   const clearError = (field: keyof FormErrors) => {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  // Máscara do horário: digita 1930 e vira 19:30
+  const handleTimeChange = (text: string) => {
+    const digits = text.replace(/\D/g, "").slice(0, 4);
+    const formatted =
+      digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+    setTime(formatted);
+    clearError("time");
   };
 
   const handleAddSubtask = () => {
@@ -117,6 +145,10 @@ export default function NewTaskScreen() {
       newErrors.category = "Escolha uma das categorias disponíveis.";
     }
 
+    if (time && !TIME_REGEX.test(time)) {
+      newErrors.time = "Use um horário válido no formato HH:MM (ex.: 19:30).";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -129,6 +161,8 @@ export default function NewTaskScreen() {
       description: description.trim() || undefined,
       category: selectedCategory as TaskCategory,
       priority: selectedPriority,
+      date: selectedDate,
+      time: time || undefined,
     };
 
     if (isEditing) {
@@ -344,18 +378,60 @@ export default function NewTaskScreen() {
 
           {/* Data */}
           <Text style={styles.label}>Data</Text>
-          <TouchableOpacity style={styles.dateSelector} activeOpacity={0.8}>
-            <View style={styles.dateInfo}>
-              <Ionicons
-                name="calendar-outline"
-                size={20}
-                color="#5B6BFE"
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.dateText}>Hoje, 18 de set</Text>
-            </View>
-            <Ionicons name="chevron-down" size={20} color="#64748B" />
-          </TouchableOpacity>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dateChipsContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            {dateOptions.map((option) => {
+              const isSelected = option.iso === selectedDate;
+              return (
+                <TouchableOpacity
+                  key={option.iso}
+                  style={[
+                    styles.dateChip,
+                    isSelected && styles.dateChipSelected,
+                  ]}
+                  onPress={() => setSelectedDate(option.iso)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.dateChipWeekday,
+                      isSelected && styles.dateChipTextSelected,
+                    ]}
+                  >
+                    {option.weekday}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.dateChipDay,
+                      isSelected && styles.dateChipTextSelected,
+                    ]}
+                  >
+                    {option.day}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <Text style={styles.dateLabelText}>
+            {formatDateLabel(selectedDate)}
+          </Text>
+
+          {/* Horário */}
+          <Text style={styles.label}>Horário (opcional)</Text>
+          <TextInput
+            style={[styles.input, errors.time && styles.inputError]}
+            placeholder="Ex: 19:30"
+            placeholderTextColor="#94A3B8"
+            value={time}
+            onChangeText={handleTimeChange}
+            keyboardType="number-pad"
+            maxLength={5}
+          />
+          {errors.time && <Text style={styles.errorText}>{errors.time}</Text>}
 
           {/* Botão Adicionar / Salvar */}
           <TouchableOpacity
@@ -535,25 +611,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  dateSelector: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
+  dateChipsContainer: {
+    gap: 8,
+    paddingRight: 20,
+  },
+  dateChip: {
+    width: 52,
+    paddingVertical: 10,
     borderRadius: 16,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  dateInfo: {
-    flexDirection: "row",
     alignItems: "center",
   },
-  dateText: {
-    fontSize: 15,
-    fontWeight: "500",
+  dateChipSelected: {
+    backgroundColor: "#5B6BFE",
+    borderColor: "#5B6BFE",
+  },
+  dateChipWeekday: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#64748B",
+  },
+  dateChipDay: {
+    fontSize: 16,
+    fontWeight: "700",
     color: "#0F172A",
+    marginTop: 2,
+  },
+  dateChipTextSelected: {
+    color: "#FFFFFF",
+  },
+  dateLabelText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#64748B",
+    marginTop: 8,
   },
   submitButton: {
     backgroundColor: "#5B6BFE",

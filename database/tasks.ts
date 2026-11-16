@@ -11,7 +11,14 @@ interface TaskRow {
   time: string | null;
   completed: number;
 }
-
+export interface UpdateTaskInput {
+  title: string;
+  description?: string;
+  category: TaskCategory;
+  priority: TaskPriority;
+  date: string;
+  time?: string;
+}
 interface SubtaskRow {
   id: number;
   task_id: number;
@@ -24,16 +31,15 @@ export interface NewTaskInput {
   description?: string;
   category: TaskCategory;
   priority: TaskPriority;
+  date: string;
+  time?: string;
   subtasks: string[];
 }
 
 // Data de hoje no formato AAAA-MM-DD
-function getTodayISO(): string {
-  const d = new Date();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${month}-${day}`;
-}
+
+
+
 function toTask(row: TaskRow, subtaskRows: SubtaskRow[]): Task {
   return {
     id: String(row.id),
@@ -71,13 +77,14 @@ export async function getTasks(db: SQLiteDatabase): Promise<Task[]> {
 // Cria a tarefa e as subtarefas juntas (se uma falhar, nenhuma é salva)
 export async function createTask(db: SQLiteDatabase, input: NewTaskInput) {
   await db.withTransactionAsync(async () => {
-    const result = await db.runAsync(
-      "INSERT INTO tasks (title, description, category, priority, date) VALUES (?, ?, ?, ?, ?)",
+        const result = await db.runAsync(
+      "INSERT INTO tasks (title, description, category, priority, date, time) VALUES (?, ?, ?, ?, ?, ?)",
       input.title,
       input.description ?? null,
       input.category,
       input.priority,
-      getTodayISO(),
+      input.date,
+      input.time ?? null,
     );
 
     for (const subtaskTitle of input.subtasks) {
@@ -156,11 +163,13 @@ export async function updateTask(
   input: UpdateTaskInput,
 ) {
   await db.runAsync(
-    "UPDATE tasks SET title = ?, description = ?, category = ?, priority = ? WHERE id = ?",
+    "UPDATE tasks SET title = ?, description = ?, category = ?, priority = ?, date = ?, time = ? WHERE id = ?",
     input.title,
     input.description ?? null,
     input.category,
     input.priority,
+    input.date,
+    input.time ?? null,
     Number(id),
   );
 }
