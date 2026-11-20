@@ -20,8 +20,8 @@ A proposta do aplicativo é oferecer uma experiência simples e intuitiva para a
 * [x] Persistir tarefas e subtarefas no banco de dados (SQLite)
 * [x] Editar tarefa
 * [x] Excluir tarefa
-* [ ] Definir data e horário para a tarefa
-* [ ] Validar os campos dos formulários
+* [x] Definir data e horário para a tarefa
+* [x] Validar os campos dos formulários
 
 ### Funcionalidades adicionais (trabalhos futuros)
 
@@ -130,14 +130,14 @@ Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo
 
 ## Planejamento de sprints
 
-O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 4 já foram concluídas; o cronograma das demais é:
+O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 5 já foram concluídas; o cronograma das demais é:
 
 | Sprint | Período | Duração | Foco |
 |---|---|---|---|
 | 4 | 02/11 a 08/11 | 1 semana | Persistência com SQLite (concluída) |
-| 5 | 09/11 a 15/11 | 1 semana | Editar, excluir e validações |
-| 6 | 16/11 a 20/11 | 1 semana | Estilos pendentes e telas não essenciais |
-| 7 | 21/11 a 25/11 | 5 dias | Testes e build do APK |
+| 5 | 09/11 a 15/11 | 1 semana | Editar, excluir e validações (concluída) |
+| 6 | 16/11 a 22/11 | 1 semana | Estilos pendentes e telas não essenciais |
+| 7 | 23/11 a 25/11 | 3 dias | Testes e build do APK |
 | 8 | 26/11 a 28/11 | 3 dias | Card de destaques, vídeo e entrega |
 
 ### Sprint 1: Planejamento e prototipação (concluída)
@@ -177,33 +177,35 @@ O desenvolvimento do **CanDo** está planejado em 8 sprints. As sprints 1 a 4 j�
 * [x] Carregar os dados da tela **Detalhes** a partir do banco, usando o `id` da rota
 * [x] Persistir a conclusão de tarefas e subtarefas
 
-### Sprint 5: Editar, excluir e validações (09/11 a 15/11)
+### Sprint 5: Editar, excluir e validações (concluída)
 * [x] Criar a tela **Editar Tarefa** reaproveitando o formulário de Nova Tarefa
 * [x] Implementar a exclusão de tarefas (com confirmação)
-* [ ] Incluir data e horário no formulário e no banco
-* [ ] Validar os campos dos formulários (título obrigatório, subtarefa vazia etc.) com mensagens de erro
+* [x] Incluir data e horário no formulário e no banco
+* [x] Validar os campos dos formulários (nome, descrição, categoria, horário e subtarefas) com mensagens de erro
 * [x] Atualização reativa da barra de progresso diário
-* [ ] Mostrar o ponto do seletor de semana apenas nos dias que têm tarefa
 
-### Sprint 6: Estilos pendentes e telas não essenciais (16/11 a 20/11)
+### Sprint 6: Estilos pendentes e telas não essenciais (16/11 a 22/11)
 * [ ] Aplicar os tokens de tema e mover os estilos das telas **Hoje** e **Nova Tarefa** para `styles/`
+* [ ] Mostrar o ponto do seletor de semana apenas nos dias que têm tarefa
 * [ ] Desenvolver a tela **Todas as tarefas** (filtro por status)
 * [ ] Desenvolver a tela **Progresso**
 * [ ] Desenvolver a tela **Splash Screen**
 * [ ] Desenvolver as telas **Perfil**, **Login** e **Cadastro**, se houver tempo
 * [ ] Implementar feedback visual (mensagens e estados de carregamento)
 
-### Sprint 7: Testes, build e estabilização (21/11 a 25/11)
-* [ ] Gerar um APK de teste com EAS Build no início da sprint
+### Sprint 7: Testes, build e estabilização (23/11 a 25/11)
+* [x] Configurar o EAS Build (`eas.json`, pacote Android e `scheme`) e gerar um APK de teste
+* [x] Alinhar as dependências do Expo ao SDK 58 (`expo-doctor`)
 * [ ] Testar o fluxo completo de tarefas e subtarefas
 * [ ] Testar a persistência dos dados ao reabrir o app
 * [ ] Corrigir bugs de layout e navegação
-* [ ] Validar com `expo-doctor` e `npx tsc --noEmit`
+* [ ] Validar com `npx tsc --noEmit`
 * [ ] Gerar o APK final com EAS Build
 * [ ] Publicar o APK como Release no GitHub
 
 ### Sprint 8: Finalização e entrega (26/11 a 28/11)
 * [ ] Ajustes finais de interface conforme o protótipo do Figma
+* [ ] Remover o arquivo de mocks (`mocks/types.ts`), que não é mais usado
 * [ ] Atualizar a documentação (marcar tarefas e justificar o que não foi feito)
 * [ ] Gerar o card de destaques do app
 * [ ] Gravar o vídeo final de apresentação
@@ -234,5 +236,5 @@ npm install
 # 4. Inicie o servidor
 npx expo start
 ```
-* Pressione **`w`** para abrir no navegador web.
+* Pressione **`w`** para abrir no navegador web (o SQLite não funciona na web).
 * Ou leia o QR Code no app **Expo Go** no celular.
