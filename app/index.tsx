@@ -1,17 +1,11 @@
 //Tela inicial
 
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-} from "react-native";
-import { useTasks } from "../hooks/useTasks";
+import { View, Text, ScrollView, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
+
+import { useTasks } from "../hooks/useTasks";
+
 import { HeaderGreeting } from "../components/HeaderGreeting";
 import { WeekDaySelector, DayItem } from "../components/WeekDaySelector";
 import { DailyProgressCard } from "../components/DailyProgressCard";
@@ -19,6 +13,7 @@ import { EmptyState } from "../components/EmptyState";
 import { TaskCard } from "../components/TaskCard";
 import { FloatingActionButton } from "../components/FloatingActionButton";
 import { BottomTabBar } from "../components/BottomTabBar";
+import { styles } from "../styles/home.styles";
 
 const WEEKDAY_NAMES = [
   "Domingo",
@@ -68,9 +63,12 @@ function getWeekDays(): DayItem[] {
     };
   });
 }
+
 export default function HomeScreen() {
   const router = useRouter();
+
   const { tasks, toggleTask } = useTasks();
+
   const [days, setDays] = useState<DayItem[]>(getWeekDays);
 
   const handleSelectDay = (dayNumber: number) => {
@@ -78,8 +76,6 @@ export default function HomeScreen() {
       prev.map((d) => ({ ...d, isSelected: d.dayNumber === dayNumber })),
     );
   };
-
- 
 
   const completedCount = tasks.filter((t) => t.completed).length;
   const totalCount = tasks.length;
@@ -129,26 +125,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 90,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#0F172A",
-    marginBottom: 16,
-  },
-});
