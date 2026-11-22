@@ -117,7 +117,7 @@ Foi desenvolvida a base arquitetural e visual do CanDo, com navegação via Expo
 * **TypeScript:** tipagem do modelo de dados (`Task`, `Subtask`) e das props dos componentes.
 * **Google Fonts (Inter):** tipografia do Figma carregada com `@expo-google-fonts/inter`.
 * **Expo Vector Icons:** ícones de navegação, status e botões com `Ionicons`.
-* **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas.
+* **Mocks de dados:** dados fake em `mocks/types.ts` para popular as telas no checkpoint anterior (removidos depois da integração com o SQLite).
 * **Theme / Design Tokens:** cores, raios, tamanhos e fontes centralizados em `constants/theme.ts`, aplicados na tela de detalhes.
 
 ### Boas práticas na criação de componentes
