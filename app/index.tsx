@@ -98,7 +98,12 @@ export default function HomeScreen() {
 
   const completedCount = dayTasks.filter((t) => t.completed).length;
   const totalCount = dayTasks.length;
-
+  // Dias da semana que têm pelo menos uma tarefa (mostram o ponto)
+  const taskDates = new Set(tasks.map((task) => task.date));
+  const daysWithDots = days.map((d) => ({
+    ...d,
+    hasTasks: taskDates.has(d.iso),
+  }));
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -112,7 +117,7 @@ export default function HomeScreen() {
             onPressSettings={() => alert("Configurações")}
           />
 
-          <WeekDaySelector days={days} onSelectDay={handleSelectDay} />
+          <WeekDaySelector days={daysWithDots} onSelectDay={handleSelectDay} />
 
           <DailyProgressCard
             completedCount={completedCount}
