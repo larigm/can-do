@@ -2,13 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Platform,
-  StatusBar,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,6 +19,8 @@ import {
   getNextDays,
   getTodayISO,
 } from "../utils/date";
+import { colors } from "../constants/theme";
+import { styles } from "../styles/newTask.styles";
 
 interface FormErrors {
   title?: string;
@@ -184,7 +183,7 @@ export default function NewTaskScreen() {
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Ionicons name="arrow-back" size={22} color="#0F172A" />
+            <Ionicons name="arrow-back" size={22} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
             {isEditing ? "Editar tarefa" : "Nova tarefa"}
@@ -201,7 +200,7 @@ export default function NewTaskScreen() {
           <TextInput
             style={[styles.input, errors.title && styles.inputError]}
             placeholder="Ex: Estudar para a prova"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textDisabled}
             value={taskName}
             onChangeText={(text) => {
               setTaskName(text);
@@ -219,7 +218,7 @@ export default function NewTaskScreen() {
               errors.description && styles.inputError,
             ]}
             placeholder="Adicione detalhes sobre a tarefa..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textDisabled}
             value={description}
             onChangeText={(text) => {
               setDescription(text);
@@ -280,7 +279,10 @@ export default function NewTaskScreen() {
               activeOpacity={0.7}
             >
               <View
-                style={[styles.priorityDot, { backgroundColor: "#60A5FA" }]}
+                style={[
+                  styles.priorityDot,
+                  { backgroundColor: colors.priorityLow },
+                ]}
               />
               <Text style={styles.priorityText}>Baixa</Text>
             </TouchableOpacity>
@@ -295,7 +297,10 @@ export default function NewTaskScreen() {
               activeOpacity={0.7}
             >
               <View
-                style={[styles.priorityDot, { backgroundColor: "#FBBF24" }]}
+                style={[
+                  styles.priorityDot,
+                  { backgroundColor: colors.priorityMedium },
+                ]}
               />
               <Text style={styles.priorityText}>Média</Text>
             </TouchableOpacity>
@@ -309,7 +314,10 @@ export default function NewTaskScreen() {
               activeOpacity={0.7}
             >
               <View
-                style={[styles.priorityDot, { backgroundColor: "#F87171" }]}
+                style={[
+                  styles.priorityDot,
+                  { backgroundColor: colors.priorityHigh },
+                ]}
               />
               <Text style={styles.priorityText}>Alta</Text>
             </TouchableOpacity>
@@ -327,7 +335,7 @@ export default function NewTaskScreen() {
                     <Ionicons
                       name="checkbox-outline"
                       size={18}
-                      color="#5B6BFE"
+                      color={colors.primary}
                       style={{ marginRight: 10 }}
                     />
                     <Text style={styles.subtaskText}>{item}</Text>
@@ -339,7 +347,7 @@ export default function NewTaskScreen() {
                     <Ionicons
                       name="close-circle-outline"
                       size={20}
-                      color="#94A3B8"
+                      color={colors.textDisabled}
                     />
                   </TouchableOpacity>
                 </View>
@@ -354,7 +362,7 @@ export default function NewTaskScreen() {
                     errors.subtask && styles.inputError,
                   ]}
                   placeholder="Adicionar subtarefa..."
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textDisabled}
                   value={newSubtaskInput}
                   onChangeText={(text) => {
                     setNewSubtaskInput(text);
@@ -367,7 +375,7 @@ export default function NewTaskScreen() {
                   onPress={handleAddSubtask}
                   activeOpacity={0.8}
                 >
-                  <Ionicons name="add" size={24} color="#FFFFFF" />
+                  <Ionicons name="add" size={24} color={colors.surface} />
                 </TouchableOpacity>
               </View>
               {errors.subtask && (
@@ -425,7 +433,7 @@ export default function NewTaskScreen() {
           <TextInput
             style={[styles.input, errors.time && styles.inputError]}
             placeholder="Ex: 19:30"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textDisabled}
             value={time}
             onChangeText={handleTimeChange}
             keyboardType="number-pad"
@@ -448,222 +456,3 @@ export default function NewTaskScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F8FAFC",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F8FAFC",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 16,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 18,
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#0F172A",
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#0F172A",
-    marginBottom: 8,
-    marginTop: 18,
-  },
-  input: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 15,
-    color: "#0F172A",
-    borderWidth: 1,
-    borderColor: "#F1F5F9",
-  },
-  inputError: {
-    borderColor: "#EF4444",
-  },
-  errorText: {
-    color: "#EF4444",
-    fontSize: 13,
-    marginTop: 6,
-  },
-  textArea: {
-    height: 100,
-  },
-  categoriesContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  categoryChip: {
-    backgroundColor: "#F1F5F9",
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 20,
-  },
-  categoryChipSelected: {
-    backgroundColor: "#5B6BFE",
-  },
-  categoryChipText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#64748B",
-  },
-  categoryChipTextSelected: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-  },
-  priorityContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  priorityCard: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 14,
-  },
-  priorityCardSelectedBaixa: {
-    borderColor: "#60A5FA",
-  },
-  priorityCardSelectedMedia: {
-    borderColor: "#FBBF24",
-  },
-  priorityCardSelectedAlta: {
-    borderColor: "#F87171",
-  },
-  priorityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  priorityText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#0F172A",
-  },
-  subtaskItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#F1F5F9",
-  },
-  subtaskContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  subtaskText: {
-    fontSize: 14,
-    color: "#0F172A",
-    fontWeight: "500",
-  },
-  addSubtaskRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  subtaskInput: {
-    flex: 1,
-  },
-  addSubtaskButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 16,
-    backgroundColor: "#5B6BFE",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dateChipsContainer: {
-    gap: 8,
-    paddingRight: 20,
-  },
-  dateChip: {
-    width: 52,
-    paddingVertical: 10,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    alignItems: "center",
-  },
-  dateChipSelected: {
-    backgroundColor: "#5B6BFE",
-    borderColor: "#5B6BFE",
-  },
-  dateChipWeekday: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#64748B",
-  },
-  dateChipDay: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0F172A",
-    marginTop: 2,
-  },
-  dateChipTextSelected: {
-    color: "#FFFFFF",
-  },
-  dateLabelText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#64748B",
-    marginTop: 8,
-  },
-  submitButton: {
-    backgroundColor: "#5B6BFE",
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 28,
-    elevation: 4,
-    shadowColor: "#6D7EF7",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-  },
-  submitButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-});
