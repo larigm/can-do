@@ -5,6 +5,7 @@ export interface DayItem {
   weekday: string;
   dayNumber: number;
   isSelected?: boolean;
+  hasTasks?: boolean;
 }
 
 interface WeekDaySelectorProps {
@@ -28,7 +29,7 @@ export function WeekDaySelector({ days, onSelectDay }: WeekDaySelectorProps) {
           <Text style={[styles.dayNumberText, item.isSelected && styles.dayNumberSelectedText]}>
             {item.dayNumber}
           </Text>
-          {item.isSelected && <View style={styles.selectedDot} />}
+          <View style={[styles.selectedDot, !item.hasTasks && styles.dotHidden]} />
         </TouchableOpacity>
       ))}
     </View>
@@ -79,5 +80,8 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: '#4F46E5',
     marginTop: 4,
+  },
+    dotHidden: {
+    backgroundColor: 'transparent',
   },
 });
