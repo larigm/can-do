@@ -40,3 +40,15 @@ export function formatDateLabel(iso: string): string {
   const text = `${day} de ${MONTHS_SHORT[month - 1]}`;
   return iso === getTodayISO() ? `Hoje, ${text}` : text;
 }
+// Título de seção da lista: "Hoje", "Amanhã" ou "24 de nov"
+export function formatSectionLabel(iso: string): string {
+  const today = new Date();
+  const tomorrow = toISODate(
+    new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+  );
+  if (iso === getTodayISO()) return "Hoje";
+  if (iso === tomorrow) return "Amanhã";
+
+  const [, month, day] = iso.split("-").map(Number);
+  return `${day} de ${MONTHS_SHORT[month - 1]}`;
+}
