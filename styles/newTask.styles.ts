@@ -1,0 +1,223 @@
+import { Platform, StatusBar, StyleSheet } from "react-native";
+import { colors, radius, fontSize, fonts } from "../constants/theme";
+
+export const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 18,
+  },
+  headerTitle: {
+    fontSize: fontSize.xxl,
+    fontFamily: fonts.bold,
+    color: colors.text,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  label: {
+    fontSize: fontSize.base,
+    fontFamily: fonts.semiBold,
+    color: colors.text,
+    marginBottom: 8,
+    marginTop: 18,
+  },
+  input: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: fontSize.md,
+    fontFamily: fonts.regular,
+    color: colors.text,
+    borderWidth: 1,
+    borderColor: colors.divider,
+  },
+  inputError: {
+    borderColor: colors.danger,
+  },
+  errorText: {
+    color: colors.danger,
+    fontSize: fontSize.sm,
+    fontFamily: fonts.regular,
+    marginTop: 6,
+  },
+  textArea: {
+    height: 100,
+  },
+  categoriesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  categoryChip: {
+    backgroundColor: colors.surfaceMuted,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: radius.lg,
+  },
+  categoryChipSelected: {
+    backgroundColor: colors.primary,
+  },
+  categoryChipText: {
+    fontSize: fontSize.base,
+    fontFamily: fonts.medium,
+    color: colors.textMuted,
+  },
+  categoryChipTextSelected: {
+    color: colors.surface,
+    fontFamily: fonts.semiBold,
+  },
+  priorityContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  priorityCard: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surface,
+    borderRadius: radius.base,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 14,
+  },
+  priorityCardSelectedBaixa: {
+    borderColor: colors.priorityLow,
+  },
+  priorityCardSelectedMedia: {
+    borderColor: colors.priorityMedium,
+  },
+  priorityCardSelectedAlta: {
+    borderColor: colors.priorityHigh,
+  },
+  priorityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  priorityText: {
+    fontSize: fontSize.base,
+    fontFamily: fonts.semiBold,
+    color: colors.text,
+  },
+  subtaskItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.surface,
+    borderRadius: radius.base,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: colors.divider,
+  },
+  subtaskContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  subtaskText: {
+    fontSize: fontSize.base,
+    fontFamily: fonts.medium,
+    color: colors.text,
+  },
+  addSubtaskRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  subtaskInput: {
+    flex: 1,
+  },
+  addSubtaskButton: {
+    width: 50,
+    height: 50,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dateChipsContainer: {
+    gap: 8,
+    paddingRight: 20,
+  },
+  dateChip: {
+    width: 52,
+    paddingVertical: 10,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+  },
+  dateChipSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  dateChipWeekday: {
+    fontSize: 12,
+    fontFamily: fonts.semiBold,
+    color: colors.textMuted,
+  },
+  dateChipDay: {
+    fontSize: fontSize.lg,
+    fontFamily: fonts.bold,
+    color: colors.text,
+    marginTop: 2,
+  },
+  dateChipTextSelected: {
+    color: colors.surface,
+  },
+  dateLabelText: {
+    fontSize: fontSize.base,
+    fontFamily: fonts.medium,
+    color: colors.textMuted,
+    marginTop: 8,
+  },
+  submitButton: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 28,
+    elevation: 4,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  submitButtonText: {
+    color: colors.surface,
+    fontSize: fontSize.lg,
+    fontFamily: fonts.bold,
+  },
+});
