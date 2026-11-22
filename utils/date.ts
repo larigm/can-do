@@ -52,3 +52,19 @@ export function formatSectionLabel(iso: string): string {
   const [, month, day] = iso.split("-").map(Number);
   return `${day} de ${MONTHS_SHORT[month - 1]}`;
 }
+// Semana atual, de segunda a domingo
+export function getCurrentWeek(): DateOption[] {
+  const today = new Date();
+  const daysSinceMonday = (today.getDay() + 6) % 7;
+  return Array.from({ length: 7 }, (_, i) =>
+    getDateOption(
+      toISODate(
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate() - daysSinceMonday + i,
+        ),
+      ),
+    ),
+  );
+}

@@ -52,6 +52,10 @@ export default function RootLayout() {
           name="tasks"
           options={{ title: "Tarefas", headerShown: false }}
         />
+        <Stack.Screen
+          name="progress"
+          options={{ title: "Progresso", headerShown: false }}
+        />
       </Stack>
     </SQLiteProvider>
   );
