@@ -46,6 +46,13 @@ const MONTH_NAMES = [
 interface WeekDay extends DayItem {
   iso: string;
 }
+// Saudação de acordo com o horário
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Bom dia";
+  if (hour < 18) return "Boa tarde";
+  return "Boa noite";
+}
 
 // Ex.: "Segunda-feira, 2 de novembro"
 function getTodayText(): string {
@@ -113,6 +120,7 @@ export default function HomeScreen() {
         >
           <HeaderGreeting
             userName="Larissa"
+            greeting={getGreeting()}
             dateText={getTodayText()}
             onPressSettings={() => router.push("/profile")}
           />
