@@ -48,7 +48,8 @@ export function BottomTabBar({ currentTab = "hoje" }: BottomTabBarProps) {
             onPress={() => {
               if (tab.key === "hoje") router.replace("/");
               if (tab.key === "tarefas") router.replace("/tasks");
-              if (tab.key === 'progresso') router.replace('/progress');
+              if (tab.key === "progresso") router.replace("/progress");
+              if (tab.key === "perfil") router.replace("/profile");
             }}
           >
             <Ionicons

@@ -114,7 +114,7 @@ export default function HomeScreen() {
           <HeaderGreeting
             userName="Larissa"
             dateText={getTodayText()}
-            onPressSettings={() => alert("Configurações")}
+            onPressSettings={() => router.push("/profile")}
           />
 
           <WeekDaySelector days={daysWithDots} onSelectDay={handleSelectDay} />

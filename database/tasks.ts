@@ -173,3 +173,12 @@ export async function updateTask(
     Number(id),
   );
 }
+// Apaga todas as tarefas concluídas (e as subtarefas delas)
+export async function deleteCompletedTasks(db: SQLiteDatabase) {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync(
+      "DELETE FROM subtasks WHERE task_id IN (SELECT id FROM tasks WHERE completed = 1)",
+    );
+    await db.runAsync("DELETE FROM tasks WHERE completed = 1");
+  });
+}
