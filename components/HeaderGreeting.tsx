@@ -5,14 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 interface HeaderGreetingProps {
   userName: string;
   dateText: string;
+  greeting?: string;
   onPressSettings?: () => void;
 }
 
-export function HeaderGreeting({ userName, dateText, onPressSettings }: HeaderGreetingProps) {
+export function HeaderGreeting({ userName, dateText, greeting = 'Bom dia', onPressSettings }: HeaderGreetingProps) {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.greeting}>Bom dia, {userName}!</Text>
+        <Text style={styles.greeting}>{greeting}, {userName}!</Text>
         <Text style={styles.date}>{dateText}</Text>
       </View>
       <TouchableOpacity 

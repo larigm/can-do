@@ -78,6 +78,16 @@ export default function TaskDetailsScreen() {
       ],
     );
   };
+  const handleEdit = () =>
+    router.push({ pathname: "/new-task", params: { id: task.id } });
+
+  const handleOptions = () => {
+    Alert.alert("Opções da tarefa", task.title, [
+      { text: "Editar tarefa", onPress: handleEdit },
+      { text: "Excluir tarefa", style: "destructive", onPress: handleDelete },
+      { text: "Cancelar", style: "cancel" },
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -99,7 +109,7 @@ export default function TaskDetailsScreen() {
 
           <TouchableOpacity
             style={styles.circleButton}
-            onPress={() => alert("Opções")}
+            onPress={() => router.push("/profile")}
             activeOpacity={0.7}
           >
             <Ionicons
@@ -150,6 +160,7 @@ export default function TaskDetailsScreen() {
               </View>
 
               <TouchableOpacity
+                onPress={handleOptions}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Ionicons
@@ -241,9 +252,7 @@ export default function TaskDetailsScreen() {
 
           <TouchableOpacity
             style={styles.editTaskButton}
-            onPress={() =>
-              router.push({ pathname: "/new-task", params: { id: task.id } })
-            }
+            onPress={handleEdit}
             activeOpacity={0.8}
           >
             <Text style={styles.editTaskButtonText}>Editar tarefa</Text>
