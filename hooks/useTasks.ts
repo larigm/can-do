@@ -2,7 +2,11 @@ import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { Task } from "../types/task";
-import { getTasks, toggleTaskCompleted } from "../database/tasks";
+import {
+  deleteCompletedTasks,
+  getTasks,
+  toggleTaskCompleted,
+} from "../database/tasks";
 
 export function useTasks() {
   const db = useSQLiteContext();
@@ -24,5 +28,10 @@ export function useTasks() {
     await loadTasks();
   };
 
-  return { tasks, toggleTask, reload: loadTasks };
+  const clearCompleted = async () => {
+    await deleteCompletedTasks(db);
+    await loadTasks();
+  };
+
+  return { tasks, toggleTask, clearCompleted, reload: loadTasks };
 }

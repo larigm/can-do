@@ -56,6 +56,10 @@ export default function RootLayout() {
           name="progress"
           options={{ title: "Progresso", headerShown: false }}
         />
+        <Stack.Screen
+          name="profile"
+          options={{ title: "Perfil", headerShown: false }}
+        />
       </Stack>
     </SQLiteProvider>
   );
