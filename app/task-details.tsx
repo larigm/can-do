@@ -1,8 +1,9 @@
 //detalhes das tarefas
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
@@ -38,8 +39,19 @@ function formatDate(date: string) {
 export default function TaskDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { task, loading, toggleTask, toggleSubtask, addSubtask, removeTask } =
-    useTask(id);
+  const {
+    task,
+    loading,
+    toggleTask,
+    toggleSubtask,
+    addSubtask,
+    removeSubtask,
+    removeTask,
+  } = useTask(id);
+
+  // Campo de nova subtarefa (os hooks ficam antes dos retornos antecipados)
+  const [newSubtask, setNewSubtask] = useState("");
+  const [subtaskError, setSubtaskError] = useState("");
 
   // Enquanto carrega do banco, mostra a tela vazia
   if (loading) {
@@ -61,6 +73,23 @@ export default function TaskDetailsScreen() {
   const subtasks = task.subtasks;
   const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
 
+  const handleAddSubtask = async () => {
+    const title = newSubtask.trim();
+
+    if (!title) {
+      setSubtaskError("Digite o nome da subtarefa.");
+      return;
+    }
+    if (subtasks.some((s) => s.title.toLowerCase() === title.toLowerCase())) {
+      setSubtaskError("Essa subtarefa já existe.");
+      return;
+    }
+
+    await addSubtask(title);
+    setNewSubtask("");
+    setSubtaskError("");
+  };
+
   const handleDelete = () => {
     Alert.alert(
       "Excluir tarefa",
@@ -78,6 +107,7 @@ export default function TaskDetailsScreen() {
       ],
     );
   };
+
   const handleEdit = () =>
     router.push({ pathname: "/new-task", params: { id: task.id } });
 
@@ -123,6 +153,7 @@ export default function TaskDetailsScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Card Principal de Informações */}
           <View style={styles.mainCard}>
@@ -209,47 +240,79 @@ export default function TaskDetailsScreen() {
               </View>
 
               {subtasks.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={styles.subtaskRow}
-                  onPress={() => toggleSubtask(item.id)}
-                  activeOpacity={0.7}
-                >
-                  {item.completed ? (
-                    <View style={styles.checkedCircle}>
-                      <Ionicons
-                        name="checkmark"
-                        size={14}
-                        color={colors.surface}
-                      />
-                    </View>
-                  ) : (
-                    <View style={styles.uncheckedCircle} />
-                  )}
-                  <Text
-                    style={[
-                      styles.subtaskTitle,
-                      item.completed && styles.subtaskTitleCompleted,
-                    ]}
+                <View key={item.id} style={styles.subtaskItemRow}>
+                  <TouchableOpacity
+                    style={styles.subtaskToggle}
+                    onPress={() => toggleSubtask(item.id)}
+                    activeOpacity={0.7}
                   >
-                    {item.title}
-                  </Text>
-                </TouchableOpacity>
+                    {item.completed ? (
+                      <View style={styles.checkedCircle}>
+                        <Ionicons
+                          name="checkmark"
+                          size={14}
+                          color={colors.surface}
+                        />
+                      </View>
+                    ) : (
+                      <View style={styles.uncheckedCircle} />
+                    )}
+                    <Text
+                      style={[
+                        styles.subtaskTitle,
+                        item.completed && styles.subtaskTitleCompleted,
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => removeSubtask(item.id)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    accessibilityLabel="Excluir subtarefa"
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={20}
+                      color={colors.textDisabled}
+                    />
+                  </TouchableOpacity>
+                </View>
               ))}
             </View>
           </View>
 
-          {/* Botões de Ação */}
-          <TouchableOpacity
-            style={styles.addSubtaskButton}
-            onPress={() => addSubtask(`Nova subtarefa ${subtasks.length + 1}`)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.addSubtaskButtonText}>
-              + Adicionar subtarefa
-            </Text>
-          </TouchableOpacity>
+          {/* Nova subtarefa */}
+          <View style={styles.subtaskInputRow}>
+            <TextInput
+              style={[
+                styles.subtaskInput,
+                subtaskError ? styles.subtaskInputError : null,
+              ]}
+              placeholder="Adicionar subtarefa..."
+              placeholderTextColor={colors.textDisabled}
+              value={newSubtask}
+              onChangeText={(text) => {
+                setNewSubtask(text);
+                setSubtaskError("");
+              }}
+              onSubmitEditing={handleAddSubtask}
+              maxLength={60}
+            />
+            <TouchableOpacity
+              style={styles.subtaskPlusButton}
+              onPress={handleAddSubtask}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="add" size={24} color={colors.surface} />
+            </TouchableOpacity>
+          </View>
+          {subtaskError ? (
+            <Text style={styles.subtaskErrorText}>{subtaskError}</Text>
+          ) : null}
 
+          {/* Botões de Ação */}
           <TouchableOpacity
             style={styles.editTaskButton}
             onPress={handleEdit}
