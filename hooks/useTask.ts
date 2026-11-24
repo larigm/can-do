@@ -4,6 +4,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { Task } from "../types/task";
 import {
   deleteTask,
+  deleteSubtask,
   getTaskById,
   insertSubtask,
   toggleSubtaskCompleted,
@@ -44,6 +45,10 @@ export function useTask(id: string | undefined) {
     await insertSubtask(db, task.id, title);
     await loadTask();
   };
+    const removeSubtask = async (subtaskId: string) => {
+    await deleteSubtask(db, subtaskId);
+    await loadTask();
+  };
 
   const removeTask = async () => {
     if (!task) return;
@@ -60,6 +65,7 @@ export function useTask(id: string | undefined) {
     toggleTask,
     toggleSubtask,
     addSubtask,
+    removeSubtask,
     removeTask,
     editTask,
   };

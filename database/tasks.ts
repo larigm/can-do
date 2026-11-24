@@ -182,3 +182,7 @@ export async function deleteCompletedTasks(db: SQLiteDatabase) {
     await db.runAsync("DELETE FROM tasks WHERE completed = 1");
   });
 }
+// Apaga uma subtarefa
+export async function deleteSubtask(db: SQLiteDatabase, id: string) {
+  await db.runAsync("DELETE FROM subtasks WHERE id = ?", Number(id));
+}
