@@ -1,6 +1,6 @@
 //interface e tipos
 export type TaskPriority = 'baixa' | 'media' | 'alta';
-export type TaskCategory = 'Trabalho' | 'Estudos' | 'Pessoal' | 'Saúde' | 'Leitura' | 'Treino';
+export type TaskCategory = string;
 
 export interface Subtask {
   id: string;
