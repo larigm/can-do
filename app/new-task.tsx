@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
 import { createTask } from "../database/tasks";
 import { useTask } from "../hooks/useTask";
+import { useCategories } from "../hooks/useCategories";
 import { TaskCategory } from "../types/task";
 import {
   formatDateLabel,
@@ -31,6 +32,15 @@ interface FormErrors {
 }
 
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+const DEFAULT_CATEGORIES = [
+  "Estudos",
+  "Leitura",
+  "Saúde",
+  "Treino",
+  "Trabalho",
+  "Pessoal",
+];
 
 export default function NewTaskScreen() {
   const router = useRouter();
@@ -54,18 +64,18 @@ export default function NewTaskScreen() {
   const [subtasks, setSubtasks] = useState<string[]>([]);
   const [newSubtaskInput, setNewSubtaskInput] = useState("");
 
+  // Categorias: as padrão, as já usadas em tarefas salvas e as criadas agora
+  const savedCategories = useCategories();
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryInput, setNewCategoryInput] = useState("");
+
   // Mensagens de erro de validação
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const categories = [
-    "Estudos",
-    "Leitura",
-    "Saúde",
-    "Treino",
-    "Trabalho",
-    "Pessoal",
-    "+ Nova",
-  ];
+  const allCategories = Array.from(
+    new Set([...DEFAULT_CATEGORIES, ...savedCategories, ...customCategories]),
+  );
 
   // Hoje e os próximos 13 dias (na edição, inclui a data atual da tarefa)
   const nextDays = getNextDays(14);
@@ -96,6 +106,43 @@ export default function NewTaskScreen() {
       digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
     setTime(formatted);
     clearError("time");
+  };
+
+  const handleSelectCategory = (category: string) => {
+    setSelectedCategory(category);
+    setShowNewCategory(false);
+    clearError("category");
+  };
+
+  // Cria uma categoria nova, com validação, e já a seleciona
+  const handleAddCategory = () => {
+    const typed = newCategoryInput.trim();
+    const name = typed.charAt(0).toUpperCase() + typed.slice(1);
+
+    if (name.length < 2) {
+      setErrors((prev) => ({
+        ...prev,
+        category: "O nome da categoria precisa ter pelo menos 2 caracteres.",
+      }));
+      return;
+    }
+    if (name.length > 20) {
+      setErrors((prev) => ({
+        ...prev,
+        category: "O nome da categoria pode ter no máximo 20 caracteres.",
+      }));
+      return;
+    }
+    if (allCategories.some((c) => c.toLowerCase() === name.toLowerCase())) {
+      setErrors((prev) => ({ ...prev, category: "Essa categoria já existe." }));
+      return;
+    }
+
+    setCustomCategories([...customCategories, name]);
+    setSelectedCategory(name);
+    setNewCategoryInput("");
+    setShowNewCategory(false);
+    clearError("category");
   };
 
   const handleAddSubtask = () => {
@@ -138,10 +185,6 @@ export default function NewTaskScreen() {
 
     if (description.trim().length > 200) {
       newErrors.description = "A descrição pode ter no máximo 200 caracteres.";
-    }
-
-    if (selectedCategory === "+ Nova") {
-      newErrors.category = "Escolha uma das categorias disponíveis.";
     }
 
     if (time && !TIME_REGEX.test(time)) {
@@ -235,7 +278,7 @@ export default function NewTaskScreen() {
           {/* Categoria */}
           <Text style={styles.label}>Categoria</Text>
           <View style={styles.categoriesContainer}>
-            {categories.map((category) => {
+            {allCategories.map((category) => {
               const isSelected = selectedCategory === category;
               return (
                 <TouchableOpacity
@@ -244,10 +287,7 @@ export default function NewTaskScreen() {
                     styles.categoryChip,
                     isSelected && styles.categoryChipSelected,
                   ]}
-                  onPress={() => {
-                    setSelectedCategory(category);
-                    clearError("category");
-                  }}
+                  onPress={() => handleSelectCategory(category)}
                   activeOpacity={0.7}
                 >
                   <Text
@@ -261,7 +301,58 @@ export default function NewTaskScreen() {
                 </TouchableOpacity>
               );
             })}
+
+            {/* Abre o campo para criar uma categoria nova */}
+            <TouchableOpacity
+              style={[
+                styles.categoryChip,
+                showNewCategory && styles.categoryChipSelected,
+              ]}
+              onPress={() => {
+                setShowNewCategory(!showNewCategory);
+                clearError("category");
+              }}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.categoryChipText,
+                  showNewCategory && styles.categoryChipTextSelected,
+                ]}
+              >
+                + Nova
+              </Text>
+            </TouchableOpacity>
           </View>
+
+          {showNewCategory && (
+            <View style={[styles.addSubtaskRow, { marginTop: 10 }]}>
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.subtaskInput,
+                  errors.category && styles.inputError,
+                ]}
+                placeholder="Nome da nova categoria"
+                placeholderTextColor={colors.textDisabled}
+                value={newCategoryInput}
+                onChangeText={(text) => {
+                  setNewCategoryInput(text);
+                  clearError("category");
+                }}
+                onSubmitEditing={handleAddCategory}
+                maxLength={20}
+                autoFocus
+              />
+              <TouchableOpacity
+                style={styles.addSubtaskButton}
+                onPress={handleAddCategory}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="checkmark" size={24} color={colors.surface} />
+              </TouchableOpacity>
+            </View>
+          )}
           {errors.category && (
             <Text style={styles.errorText}>{errors.category}</Text>
           )}

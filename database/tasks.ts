@@ -186,3 +186,10 @@ export async function deleteCompletedTasks(db: SQLiteDatabase) {
 export async function deleteSubtask(db: SQLiteDatabase, id: string) {
   await db.runAsync("DELETE FROM subtasks WHERE id = ?", Number(id));
 }
+// Categorias já usadas nas tarefas salvas
+export async function getCategories(db: SQLiteDatabase): Promise<string[]> {
+  const rows = await db.getAllAsync<{ category: string }>(
+    "SELECT DISTINCT category FROM tasks ORDER BY category",
+  );
+  return rows.map((row) => row.category);
+}
